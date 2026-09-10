@@ -6,6 +6,12 @@ import sys
 import time
 from datetime import datetime
 
+try:
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+except Exception:
+    pass
+
 from browser_use import Agent
 from browser_use.tools.service import Tools
 
@@ -23,6 +29,15 @@ DEFAULT_TASK = (
     "and report the page title and URL. Then stop."
 )
 DEFAULT_EXPECTED = "Example Domain"
+
+EXTRA_PROMPT = (
+    "Stability rules:\n"
+    "1. If the target page is ALREADY open and you already know the "
+    "required information, call done. Do NOT call navigate again.\n"
+    "2. When calling done, the text must contain the actual observed "
+    "values: copy the page <title> EXACTLY as shown, and the exact URL. "
+    "Never repeat the user's task phrase as the answer.\n"
+)
 
 ACL_ACTIONS = {
     "navigate",
@@ -92,6 +107,7 @@ async def run_one(index, args):
         llm_timeout=args.llm_timeout,
         message_compaction=False,
         enable_signal_handler=False,
+        extend_system_message=EXTRA_PROMPT if args.extra_prompt else None,
     )
 
     trace = []
@@ -107,29 +123,41 @@ async def run_one(index, args):
 
     elapsed = round(time.time() - start, 2)
 
+    done = False
+    successful = None
+    final = ""
+    errors = [error] if error else []
+    trace = []
+
     if history is not None:
-        done = history.is_done()
-        successful = history.is_successful()
-        final = history.final_result() or ""
-        errors = [e for e in history.errors() if e]
-        for h in history.history:
-            act = h.model_output.action if h.model_output else []
-            actions = [
-                (a.model_dump(exclude_none=True, mode="json") if hasattr(a, "model_dump") else a)
-                for a in act
-            ]
-            trace.append(
-                {
-                    "url": h.state.url if hasattr(h.state, "url") else None,
-                    "actions": actions,
-                    "result": [r.model_dump() if hasattr(r, "model_dump") else str(r) for r in h.result],
-                }
-            )
-    else:
-        done = False
-        successful = None
-        final = ""
-        errors = [error] if error else []
+        try:
+            done = history.is_done()
+            successful = history.is_successful()
+            final = history.final_result() or ""
+            errors = [e for e in history.errors() if e]
+            for h in history.history:
+                act = h.model_output.action if h.model_output else []
+                actions = [
+                    (a.model_dump(exclude_none=True, mode="json") if hasattr(a, "model_dump") else a)
+                    for a in act
+                ]
+                trace.append(
+                    {
+                        "url": h.state.url if hasattr(h.state, "url") else None,
+                        "actions": actions,
+                        "result": [
+                            r.model_dump() if hasattr(r, "model_dump") else str(r) for r in h.result
+                        ],
+                    }
+                )
+        except Exception as e:
+            errors = [error, f"post_process: {type(e).__name__}: {e}"]
+            done = False
+            successful = None
+            final = ""
+
+    if not done and not final and not errors:
+        errors = ["hit max_steps without done"]
 
     passed = bool(final) and args.expected.lower() in final.lower()
 
@@ -139,6 +167,15 @@ async def run_one(index, args):
         "model": args.model,
         "task": args.task,
         "expected": args.expected,
+        "settings": {
+            "max_steps": args.max_steps,
+            "max_failures": args.max_failures,
+            "extra_prompt": args.extra_prompt,
+            "num_ctx": args.num_ctx,
+            "num_predict": args.num_predict,
+            "headless": not args.headed,
+            "acl_actions": sorted(ACL_ACTIONS),
+        },
         "done": done,
         "successful": successful,
         "passed": passed,
@@ -178,13 +215,19 @@ async def main():
     parser.add_argument("--model", default="qwen3:1.7b")
     parser.add_argument("--task", default=DEFAULT_TASK)
     parser.add_argument("--expected", default=DEFAULT_EXPECTED)
-    parser.add_argument("--max-steps", type=int, default=8)
+    parser.add_argument("--max-steps", type=int, default=10)
     parser.add_argument("--max-failures", type=int, default=3)
     parser.add_argument("--llm-timeout", type=int, default=240)
     parser.add_argument("--step-timeout", type=int, default=180)
     parser.add_argument("--num-ctx", type=int, default=8192)
     parser.add_argument("--num-predict", type=int, default=1024)
     parser.add_argument("--max-history-items", type=int, default=6)
+    parser.add_argument(
+        "--no-extra-prompt",
+        dest="extra_prompt",
+        action="store_false",
+        help="Desactivar el prompt extra de estabilidad",
+    )
     parser.add_argument(
         "--headed",
         action="store_true",
