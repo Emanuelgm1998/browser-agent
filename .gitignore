@@ -7,3 +7,5 @@ browser_profile/
 *.png
 *.gif
 ollama_raw_logs/
+benchmark/runs/
+benchmark/reports/

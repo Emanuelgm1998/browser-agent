@@ -33,6 +33,36 @@ DEFAULT_TASK = (
 )
 DEFAULT_EXPECTED = "Example Domain"
 
+
+_ATTRIBUTION_LOG = os.path.join(RUNS_DIR, "attribution_warnings.log")
+
+
+def _log_runner_event(event, pid, path):
+    line = f"{datetime.now().isoformat()} PID={pid} event={event} path={path}\n"
+    try:
+        with open(_ATTRIBUTION_LOG, "a", encoding="utf-8") as f:
+            f.write(line)
+    except Exception:
+        pass
+    print(f"[runner-attribution] {line.rstrip()}", file=sys.stderr)
+
+
+def write_json_exclusive(model_dir, base_name, data):
+    for attempt in range(8):
+        if attempt == 0:
+            candidate = base_name
+        else:
+            candidate = f"{base_name[:-5]}_{time.time_ns() & 0xFFFFF:05x}.json"
+        try:
+            with open(os.path.join(model_dir, candidate), "x", encoding="utf-8") as f:
+                json.dump(data, f, ensure_ascii=False, indent=2)
+            return os.path.join(model_dir, candidate)
+        except FileExistsError:
+            _log_runner_event("collision", os.getpid(), os.path.join(model_dir, candidate))
+            continue
+    _log_runner_event("exhausted", os.getpid(), os.path.join(model_dir, base_name))
+    raise RuntimeError(f"No se pudo reservar un nombre de archivo unico: {base_name}")
+
 EXTRA_PROMPT = (
     "Stability rules:\n"
     "1. If the target page is ALREADY open and you already know the "
@@ -96,6 +126,24 @@ def build_tools():
         url = url.strip().split("#")[0]
         return url.rstrip("/").lower()
 
+    async def _enrich_title(browser_session, old_result):
+        try:
+            title, href = await fetch_live_page_data(browser_session)
+        except Exception:
+            title = href = None
+        if not title:
+            return old_result
+        ext = getattr(old_result, "extracted_content", None) or ""
+        note = f'\n[REAL_TITLE] Trusted <title> from CDP: &quot;{title}&quot;. Report THIS exact title in done.text.'
+        mem = f"REAL title of the loaded page document.title = &quot;{title}&quot;" + (f" | REAL url = {href}." if href else ".")
+        return ActionResult(
+            is_done=getattr(old_result, "is_done", False),
+            error=None,
+            long_term_memory=mem,
+            extracted_content=(ext + note) if ext else note,
+            include_in_memory=True,
+        )
+
     async def guarded_navigate(params, browser_session):
         new_tab = bool(getattr(params, "new_tab", False))
         if not new_tab and last_nav_url["value"] is not None:
@@ -120,6 +168,7 @@ def build_tools():
         if result is not None and getattr(result, "error", None) is None:
             last_nav_url["value"] = normalize_url(params.url)
             last_nav_url["count"] = 0
+            result = await _enrich_title(browser_session, result)
         return result
 
     import browser_use.tools.registry.views as rv
@@ -459,16 +508,16 @@ async def run_one(index, args):
         "steps": len(res["trace"]),
         "elapsed_s": elapsed_total,
         "trace": res["trace"],
+        "writer_pid": os.getpid(),
     }
 
     model_dir = os.path.join(RUNS_DIR, args.model.replace(":", "_"))
     os.makedirs(model_dir, exist_ok=True)
-    run_file = os.path.join(
-        model_dir,
-        f"run_{datetime.now().strftime('%Y%m%d_%H%M%S')}_{index:03d}.json",
+    base_name = (
+        f"run_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+        f"_{index:03d}_p{os.getpid()}.json"
     )
-    with open(run_file, "w", encoding="utf-8") as f:
-        json.dump(record, f, ensure_ascii=False, indent=2)
+    run_file = write_json_exclusive(model_dir, base_name, record)
 
     print()
     print(f"--- Corrida {index} ---")
@@ -548,30 +597,23 @@ async def main():
         for ft, count in sorted(breakdown.items()):
             print(f"  - {ft}: {count}")
 
-    summary_file = os.path.join(
-        RUNS_DIR,
-        args.model.replace(":", "_"),
-        f"summary_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json",
+    summary_file = write_json_exclusive(
+        os.path.join(RUNS_DIR, args.model.replace(":", "_")),
+        f"summary_{datetime.now().strftime('%Y%m%d_%H%M%S')}_p{os.getpid()}.json",
+        {
+            "model": args.model,
+            "runs": len(results),
+            "done": done,
+            "verified": verified,
+            "passed": passed,
+            "success_rate": round(passed / len(results) * 100, 1) if results else 0,
+            "failure_breakdown": breakdown if results else {},
+            "results": [
+                {k: r[k] for k in ("index", "passed", "verified", "failure_type", "steps", "elapsed_s", "final_result")}
+                for r in results
+            ],
+        },
     )
-    with open(summary_file, "w", encoding="utf-8") as f:
-        json.dump(
-            {
-                "model": args.model,
-                "runs": len(results),
-                "done": done,
-                "verified": verified,
-                "passed": passed,
-                "success_rate": round(passed / len(results) * 100, 1) if results else 0,
-                "failure_breakdown": breakdown if results else {},
-                "results": [
-                    {k: r[k] for k in ("index", "passed", "verified", "failure_type", "steps", "elapsed_s", "final_result")}
-                    for r in results
-                ],
-            },
-            f,
-            ensure_ascii=False,
-            indent=2,
-        )
     print(f"summary={summary_file}")
 
 
