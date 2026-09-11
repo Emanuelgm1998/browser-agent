@@ -1,0 +1,103 @@
+{
+  "model": "qwen3:1.7b",
+  "runs": 10,
+  "done": 10,
+  "verified": 10,
+  "passed": 10,
+  "success_rate": 100.0,
+  "failure_breakdown": {
+    "success": 10
+  },
+  "results": [
+    {
+      "index": 1,
+      "passed": true,
+      "verified": true,
+      "failure_type": "success",
+      "steps": 3,
+      "elapsed_s": 24.17,
+      "final_result": "Example Domain"
+    },
+    {
+      "index": 2,
+      "passed": true,
+      "verified": true,
+      "failure_type": "success",
+      "steps": 3,
+      "elapsed_s": 42.96,
+      "final_result": "<title>Example Domain</title><meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" /><meta name=\"generator\" content=\"Example Domain\" /><meta name=\"description\" content=\"This domain is for use in documentation examples without needing permission. Avoid use in operations.\" /><meta name=\"viewport\" content=\"width=device-width\" /><link rel=\"icon\" href=\"https://example.com/favicon.ico\" /><body>Example Domain<br><br>This domain is for use in documentation examples without needing permission. Avoid use in operations.<br><br>Learn more</body>"
+    },
+    {
+      "index": 3,
+      "passed": true,
+      "verified": true,
+      "failure_type": "success",
+      "steps": 3,
+      "elapsed_s": 31.41,
+      "final_result": "Example Domain"
+    },
+    {
+      "index": 4,
+      "passed": true,
+      "verified": true,
+      "failure_type": "success",
+      "steps": 3,
+      "elapsed_s": 44.73,
+      "final_result": "<title>Example Domain</title><meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" /><meta name=\"generator\" content=\"Example Domain\" /><meta name=\"description\" content=\"This domain is for use in documentation examples without needing permission. Avoid use in operations.\" /><meta name=\"viewport\" content=\"width=device-width\" /><link rel=\"icon\" href=\"https://example.com/favicon.ico\" /><style>body { background-color: #f0f0f0; color: #333; } h1 { margin-top: 0; }</style><h1>Example Domain</h1><p>This domain is for use in documentation examples without needing permission. Avoid use in operations.</p><a href=\"https://example.com/learn\">Learn more</a>"
+    },
+    {
+      "index": 5,
+      "passed": true,
+      "verified": true,
+      "failure_type": "success",
+      "steps": 3,
+      "elapsed_s": 30.36,
+      "final_result": "Example Domain"
+    },
+    {
+      "index": 6,
+      "passed": true,
+      "verified": true,
+      "failure_type": "success",
+      "steps": 3,
+      "elapsed_s": 28.52,
+      "final_result": "Example Domain"
+    },
+    {
+      "index": 7,
+      "passed": true,
+      "verified": true,
+      "failure_type": "success",
+      "steps": 3,
+      "elapsed_s": 25.89,
+      "final_result": "Example Domain"
+    },
+    {
+      "index": 8,
+      "passed": true,
+      "verified": true,
+      "failure_type": "success",
+      "steps": 3,
+      "elapsed_s": 27.46,
+      "final_result": "Example Domain"
+    },
+    {
+      "index": 9,
+      "passed": true,
+      "verified": true,
+      "failure_type": "success",
+      "steps": 3,
+      "elapsed_s": 27.83,
+      "final_result": "Example Domain"
+    },
+    {
+      "index": 10,
+      "passed": true,
+      "verified": true,
+      "failure_type": "success",
+      "steps": 3,
+      "elapsed_s": 47.23,
+      "final_result": "<title>Example Domain</title><meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" /><meta name=\"generator\" content=\"Example Domain\" /><meta name=\"description\" content=\"This domain is for use in documentation examples without needing permission. Avoid use in operations.\" /><meta name=\"viewport\" content=\"width=device-width\" /><link rel=\"icon\" href=\"https://example.com/favicon.ico\" /><style>body { background-color: #f0f0f0; color: #333; } h1 { margin: 0; } .example-domain { font-weight: bold; } .example-domain a { color: #007acc; text-decoration: none; } .example-domain a:hover { text-decoration: underline; } .learn-more { display: inline-block; margin: 1em 0; } </style><div class=\"example-domain\">Example Domain</div><div class=\"learn-more\">Learn more</div>"
+    }
+  ]
+}

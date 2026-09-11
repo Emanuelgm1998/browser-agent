@@ -1,332 +1,736 @@
-"""Drivers para interactuar con ChatGPT y Claude desde el navegador.
-
-Usa un perfil persistente separado (browser_profile_chat/) para aislar
-el riesgo de baneo de las cuentas de trabajo.
-"""
+from __future__ import annotations
 
 import asyncio
+import time
 from pathlib import Path
+from typing import Optional
 
-from playwright.async_api import async_playwright
+from playwright.async_api import (
+    Browser,
+    BrowserContext,
+    Page,
+    async_playwright,
+)
 
-# ── Config ──────────────────────────────────────────────────────────────────
 
-CHAT_PROFILE = Path(__file__).parent / "browser_profile_chat"
+BASE_DIR = Path(__file__).resolve().parent
 
-STREAM_TIMEOUT_MS = 200_000  # tiempo máximo de espera para streaming
-PAGE_TIMEOUT_MS = 40_000
-NAV_TIMEOUT_MS = 30_000
-EXTRA_BUFFER_MS = 2000
+PROFILE_DIR = BASE_DIR / "browser_profile_chat"
 
-# ── Excepción ───────────────────────────────────────────────────────────────
+CHATGPT_URL = "https://chatgpt.com/"
+CLAUDE_URL = "https://claude.ai/"
 
-class LoginRequired(Exception):
-    def __init__(self, service: str):
-        self.service = service
-        super().__init__(
-            f"No se detectó sesión activa en {service}. "
-            "Ejecuta setup_cuentas.py y haz login manual una vez."
-        )
+# ------------------------------------------------------------
+# CONFIGURACION RAPIDA
+# ------------------------------------------------------------
 
-# ── Driver principal ────────────────────────────────────────────────────────
+POLL_INTERVAL = 0.30
+STABLE_INTERVAL = 0.45
+
+PAGE_TIMEOUT = 20_000
+RESPONSE_TIMEOUT = 120_000
+
+# Evita volver a esperar segundos completos cuando
+# la pagina ya esta cargada.
+FAST_WAIT = 250
+
+# Numero de comprobaciones consecutivas con texto identico
+# para considerar que el streaming termino.
+STABLE_CHECKS = 8
+
+# Palabras que indican que el modelo todavia esta "pensando"/generando
+# (observadas en la UI real de ChatGPT y Claude: "Pensar", "Triangulando").
+# Si aparecen al final del texto, NO se considera respuesta estable
+# aunque el texto no haya cambiado en varios polls.
+GENERATING_MARKERS = [
+    "Pensar",
+    "Pensando",
+    "Triangulando",
+    "Analizando",
+    "Razonando",
+    "Thinking",
+]
+
+
+class LoginRequired(RuntimeError):
+    pass
+
 
 class ChatBrain:
-    """Manejador de sesiones para ChatGPT y Claude.
+    """
+    Dual Brain browser driver.
 
-    Ejemplo::
+    Mantiene una unica instancia de Chromium y reutiliza
+    las paginas de ChatGPT y Claude durante toda la sesion.
 
-        async with ChatBrain() as brain:
-            r1 = await brain.chatgpt("Explícame quantum computing en 3 pasos")
-            r2 = await brain.claude(f"Refíname este plan:\n{r1}")
+    Objetivo:
+        ChatGPT -> Claude -> ChatGPT
+
+    sin cerrar/reabrir el navegador entre llamadas.
     """
 
-    def __init__(self, profile_dir: str | Path | None = None):
-        self.profile_dir = Path(profile_dir or CHAT_PROFILE)
-        self._pw = None
-        self._context = None
+    def __init__(
+        self,
+        profile_dir: Optional[Path] = None,
+        headless: bool = False,
+    ):
+        self.profile_dir = Path(profile_dir or PROFILE_DIR)
+        self.headless = headless
+
+        self.playwright = None
+        self.context: Optional[BrowserContext] = None
+
+        self.chatgpt_page: Optional[Page] = None
+        self.claude_page: Optional[Page] = None
+
+        self._started = False
+
+    # --------------------------------------------------------
+    # CONTEXT MANAGER
+    # --------------------------------------------------------
 
     async def __aenter__(self):
-        self._pw = await async_playwright().start()
-        self._context = await self._pw.chromium.launch_persistent_context(
-            user_data_dir=str(self.profile_dir),
-            headless=False,
-            viewport={"width": 1400, "height": 900},
-            args=["--disable-blink-features=AutomationControlled"],
-        )
+        await self.start()
         return self
 
-    async def __aexit__(self, *exc):
-        try:
-            await self._context.close()
-        except Exception:
-            pass
-        if self._pw:
-            await self._pw.stop()
+    async def __aexit__(self, exc_type, exc, tb):
+        await self.close()
 
-    # ── ChatGPT ─────────────────────────────────────────────────────────
+    # --------------------------------------------------------
+    # START
+    # --------------------------------------------------------
 
-    async def chatgpt(self, text: str, new_chat: bool = True) -> str:
-        """Envía un mensaje a ChatGPT y devuelve la respuesta."""
-        page = await self._get_page()
+    async def start(self):
+        if self._started and self.context:
+            return
 
-        # Ir a chatgpt.com
-        await page.goto(
-            "https://chatgpt.com/",
-            wait_until="domcontentloaded",
-            timeout=NAV_TIMEOUT_MS,
-        )
-        await page.wait_for_timeout(2000)
+        self.profile_dir.mkdir(parents=True, exist_ok=True)
 
-        # Verificar login
-        if await self._needs_login_chatgpt(page):
-            raise LoginRequired("ChatGPT")
+        self.playwright = await async_playwright().start()
 
-        # Nuevo chat si se pide
-        if new_chat:
-            await self._new_chat_chatgpt(page)
-            await page.wait_for_timeout(1000)
-
-        # Escribir en el textarea
-        textarea = page.locator("#prompt-textarea")
-        try:
-            await textarea.wait_for(state="visible", timeout=10_000)
-        except Exception:
-            raise LoginRequired("ChatGPT (textarea no encontrado)")
-
-        await textarea.click()
-        await page.keyboard.insert_text(text)
-
-        # Enviar: intentar botón send, fallback Enter
-        sent = await self._click_send_button(
-            page,
-            [
-                '[data-testid="send-button"]',
-                'button[aria-label="Send prompt"]',
-            ],
-        )
-        if not sent:
-            await page.keyboard.press("Enter")
-
-        # Esperar fin de streaming
-        await self._wait_stream_end(
-            page,
-            stop_sel='[data-testid="stop-button"]',
-        )
-
-        # Extraer respuesta del asistente
-        return await self._extract_last_message(
-            page,
-            selector_candidates=[
-                '[data-message-author-role="assistant"] .markdown',
-                '[data-message-author-role="assistant"]',
+        self.context = await self.playwright.chromium.launch_persistent_context(
+            user_data_dir=str(self.profile_dir),
+            headless=self.headless,
+            viewport={"width": 1440, "height": 900},
+            args=[
+                "--disable-blink-features=AutomationControlled",
             ],
         )
 
-    async def _new_chat_chatgpt(self, page):
-        """Intenta iniciar un chat nuevo en ChatGPT."""
-        # Botón "New chat" — varios selectores posibles según versión
-        btn_selectors = [
-            '[data-testid="new-chat-button"]',
-            'a[aria-label="New chat"]',
-            'a[aria-label="Chat new"]',
-            'button[aria-label="New chat"]',
-        ]
-        for sel in btn_selectors:
-            btn = page.locator(sel).first
+        self._started = True
+
+        # Reutilizar paginas existentes si existen.
+        pages = list(self.context.pages)
+
+        for page in pages:
             try:
-                if await btn.count() > 0:
-                    await btn.click(timeout=3000)
-                    return
-            except Exception:
-                continue
-        # Si no encontramos el botón, la navegación a / ya abre un chat nuevo
+                url = page.url.lower()
 
-    async def _needs_login_chatgpt(self, page) -> bool:
-        url = page.url.lower()
-        if "auth.openai.com" in url or "login" in url:
-            return True
-        body = ""
+                if "chatgpt.com" in url and self.chatgpt_page is None:
+                    self.chatgpt_page = page
+
+                elif "claude.ai" in url and self.claude_page is None:
+                    self.claude_page = page
+            except Exception:
+                pass
+
+        # Crear/navegar solamente cuando sea necesario.
+        if self.chatgpt_page is None:
+            self.chatgpt_page = await self.context.new_page()
+
+        if self.claude_page is None:
+            self.claude_page = await self.context.new_page()
+
+        await self._ensure_chatgpt_ready()
+        await self._ensure_claude_ready()
+
+    # --------------------------------------------------------
+    # CLOSE
+    # --------------------------------------------------------
+
+    async def close(self):
         try:
-            body = await page.locator("body").inner_text(timeout=5000)
+            if self.context:
+                await self.context.close()
+        finally:
+            self.context = None
+            self.chatgpt_page = None
+            self.claude_page = None
+            self._started = False
+
+            if self.playwright:
+                await self.playwright.stop()
+
+            self.playwright = None
+
+    # --------------------------------------------------------
+    # PAGE READY
+    # --------------------------------------------------------
+
+    async def _ensure_chatgpt_ready(self):
+        if not self.chatgpt_page:
+            raise RuntimeError("ChatGPT page no disponible.")
+
+        page = self.chatgpt_page
+
+        start = time.perf_counter()
+
+        if "chatgpt.com" not in page.url.lower():
+            await page.goto(
+                CHATGPT_URL,
+                wait_until="domcontentloaded",
+                timeout=PAGE_TIMEOUT,
+            )
+
+        await self._wait_page_interactive(page)
+
+        if "/auth/" in page.url.lower() or "/login" in page.url.lower():
+            raise LoginRequired(
+                "ChatGPT requiere login. Inicia sesion manualmente "
+                "en browser_profile_chat."
+            )
+
+        # Selector actual y fallback.
+        selectors = [
+            "#prompt-textarea",
+            "textarea",
+            "div[contenteditable='true']",
+        ]
+
+        if not await self._wait_for_any(page, selectors, 8):
+            raise LoginRequired(
+                "No se encontro el cuadro de ChatGPT. "
+                "Puede requerir login."
+            )
+
+        elapsed = time.perf_counter() - start
+
+        print(
+            f"[ChatGPT] listo en {elapsed:.2f}s",
+            flush=True,
+        )
+
+    async def _ensure_claude_ready(self):
+        if not self.claude_page:
+            raise RuntimeError("Claude page no disponible.")
+
+        page = self.claude_page
+
+        start = time.perf_counter()
+
+        if "claude.ai" not in page.url.lower():
+            await page.goto(
+                CLAUDE_URL,
+                wait_until="domcontentloaded",
+                timeout=PAGE_TIMEOUT,
+            )
+
+        await self._wait_page_interactive(page)
+
+        if "/login" in page.url.lower():
+            raise LoginRequired(
+                "Claude requiere login. Inicia sesion manualmente "
+                "en browser_profile_chat."
+            )
+
+        selectors = [
+            "div[contenteditable='true']",
+            "textarea",
+        ]
+
+        if not await self._wait_for_any(page, selectors, 8):
+            raise LoginRequired(
+                "No se encontro el cuadro de Claude. "
+                "Puede requerir login."
+            )
+
+        elapsed = time.perf_counter() - start
+
+        print(
+            f"[Claude] listo en {elapsed:.2f}s",
+            flush=True,
+        )
+
+    # --------------------------------------------------------
+    # FAST HELPERS
+    # --------------------------------------------------------
+
+    async def _wait_page_interactive(self, page: Page):
+        try:
+            await page.wait_for_load_state(
+                "domcontentloaded",
+                timeout=PAGE_TIMEOUT,
+            )
         except Exception:
             pass
-        body_lower = body.lower()
-        textarea = page.locator("#prompt-textarea")
-        try:
-            if await textarea.count() == 0 and (
-                "log in" in body_lower or "sign up" in body_lower
-            ):
-                return True
-        except Exception:
-            pass
+
+        # Pequeña espera solo para permitir render inicial.
+        await page.wait_for_timeout(FAST_WAIT)
+
+    async def _wait_for_any(
+        self,
+        page: Page,
+        selectors: list[str],
+        timeout_seconds: float,
+    ) -> bool:
+
+        deadline = time.perf_counter() + timeout_seconds
+
+        while time.perf_counter() < deadline:
+
+            for selector in selectors:
+                try:
+                    locator = page.locator(selector).first
+
+                    if await locator.is_visible(timeout=150):
+                        return True
+
+                except Exception:
+                    pass
+
+            await asyncio.sleep(POLL_INTERVAL)
+
         return False
 
-    # ── Claude ───────────────────────────────────────────────────────────
+    async def _first_visible(
+        self,
+        page: Page,
+        selectors: list[str],
+    ):
+        for selector in selectors:
+            try:
+                locator = page.locator(selector).first
+
+                if await locator.is_visible(timeout=200):
+                    return locator
+            except Exception:
+                pass
+
+        return None
+
+    # --------------------------------------------------------
+    # TEXT EXTRACTION
+    # --------------------------------------------------------
+
+    async def _body_text(self, page: Page) -> str:
+        try:
+            return await page.locator("body").inner_text(
+                timeout=2_000
+            )
+        except Exception:
+            return ""
+
+    async def _wait_response_stable(
+        self,
+        page: Page,
+        baseline: str,
+    ) -> str:
+
+        start = time.perf_counter()
+
+        last_text = baseline
+        stable_count = 0
+
+        while time.perf_counter() - start < RESPONSE_TIMEOUT / 1000:
+
+            await asyncio.sleep(POLL_INTERVAL)
+
+            try:
+                current = await self._body_text(page)
+            except Exception:
+                continue
+
+            if not current:
+                continue
+
+            if current == last_text:
+                stable_count += 1
+            else:
+                stable_count = 0
+                last_text = current
+
+            # Respuesta estabilizada.
+            if stable_count >= STABLE_CHECKS:
+                return current
+
+        return last_text
+
+    # --------------------------------------------------------
+    # CHATGPT
+    # --------------------------------------------------------
+
+    async def chatgpt(
+        self,
+        text: str,
+        new_chat: bool = True,
+    ) -> str:
+
+        if not self._started:
+            await self.start()
+
+        page = self.chatgpt_page
+
+        if not page:
+            raise RuntimeError("ChatGPT page no disponible.")
+
+        total_start = time.perf_counter()
+
+        print("[ChatGPT] preparando prompt...", flush=True)
+
+        # Para esta fase usamos una conversacion nueva.
+        # No recargamos el sitio completo.
+        if new_chat:
+            try:
+                new_chat_selectors = [
+                    "a[href='/']",
+                    "a[href='/?oai-dm=1']",
+                    "button:has-text('New chat')",
+                    "[aria-label*='New chat']",
+                ]
+
+                button = await self._first_visible(
+                    page,
+                    new_chat_selectors,
+                )
+
+                if button:
+                    await button.click()
+                    await page.wait_for_timeout(FAST_WAIT)
+
+            except Exception:
+                pass
+
+        input_selectors = [
+            "#prompt-textarea",
+            "textarea",
+            "div[contenteditable='true']",
+        ]
+
+        input_box = await self._first_visible(
+            page,
+            input_selectors,
+        )
+
+        if input_box is None:
+            await self._ensure_chatgpt_ready()
+
+            input_box = await self._first_visible(
+                page,
+                input_selectors,
+            )
+
+        if input_box is None:
+            raise LoginRequired(
+                "No se encontro input de ChatGPT."
+            )
+
+        before = await self._body_text(page)
+
+        send_start = time.perf_counter()
+
+        try:
+            await input_box.fill(text)
+        except Exception:
+            await input_box.click()
+            await page.keyboard.press("Control+A")
+            await page.keyboard.type(text)
+
+        # Enter envia.
+        await input_box.press("Enter")
+
+        send_elapsed = time.perf_counter() - send_start
+
+        print(
+            f"[ChatGPT] prompt enviado en {send_elapsed:.2f}s",
+            flush=True,
+        )
+
+        response = await self._wait_chatgpt_response(
+            page,
+            before,
+        )
+
+        total = time.perf_counter() - total_start
+
+        print(
+            f"[ChatGPT] respuesta recibida en {total:.2f}s",
+            flush=True,
+        )
+
+        return response
+
+    async def _wait_chatgpt_response(
+        self,
+        page: Page,
+        before: str,
+    ) -> str:
+
+        start = time.perf_counter()
+
+        last = before
+        stable = 0
+
+        while time.perf_counter() - start < RESPONSE_TIMEOUT / 1000:
+
+            await asyncio.sleep(POLL_INTERVAL)
+
+            try:
+                current = await self._body_text(page)
+            except Exception:
+                continue
+
+            if not current:
+                continue
+
+            if current == last:
+                stable += 1
+            else:
+                stable = 0
+                last = current
+
+            # Evitar considerar inmediatamente el body viejo.
+            # Tambien evitar cortar mientras el modelo sigue "pensando".
+            if (
+                current != before
+                and stable >= STABLE_CHECKS
+                and not self._looks_like_still_generating(current)
+            ):
+                return self._extract_latest_response(
+                    current,
+                    before,
+                )
+
+        return self._extract_latest_response(
+            last,
+            before,
+        )
+
+    # --------------------------------------------------------
+    # CLAUDE
+    # --------------------------------------------------------
 
     async def claude(self, text: str) -> str:
-        """Envía un mensaje a Claude y devuelve la respuesta."""
-        page = await self._get_page()
 
-        # Ir a chat nuevo
-        await page.goto(
-            "https://claude.ai/new",
-            wait_until="domcontentloaded",
-            timeout=NAV_TIMEOUT_MS,
+        if not self._started:
+            await self.start()
+
+        page = self.claude_page
+
+        if not page:
+            raise RuntimeError("Claude page no disponible.")
+
+        total_start = time.perf_counter()
+
+        print("[Claude] preparando prompt...", flush=True)
+
+        input_selectors = [
+            "div[contenteditable='true']",
+            "textarea",
+        ]
+
+        input_box = await self._first_visible(
+            page,
+            input_selectors,
         )
-        await page.wait_for_timeout(2500)
 
-        # Verificar login
-        if await self._needs_login_claude(page):
-            raise LoginRequired("Claude")
+        if input_box is None:
+            await self._ensure_claude_ready()
 
-        # Encontrar el composer
-        composer = page.locator(
-            '.ProseMirror[contenteditable="true"]'
-        ).first
+            input_box = await self._first_visible(
+                page,
+                input_selectors,
+            )
+
+        if input_box is None:
+            raise LoginRequired(
+                "No se encontro input de Claude."
+            )
+
+        before = await self._body_text(page)
+
+        send_start = time.perf_counter()
 
         try:
-            await composer.wait_for(state="visible", timeout=10_000)
+            await input_box.fill(text)
         except Exception:
-            raise LoginRequired("Claude (textarea no encontrado)")
+            await input_box.click()
+            await page.keyboard.press("Control+A")
+            await page.keyboard.type(text)
 
-        await composer.click()
-        await page.keyboard.insert_text(text)
+        await input_box.press("Enter")
 
-        # Enviar: botón Send o Ctrl+Enter
-        sent = await self._click_send_button(
-            page,
-            [
-                'button[aria-label*="Send"]',
-                'button[aria-label*="Enviar"]',
-            ],
-        )
-        if not sent:
-            await page.keyboard.press("Control+Enter")
+        send_elapsed = time.perf_counter() - send_start
 
-        # Esperar fin de streaming
-        await self._wait_stream_end(
-            page,
-            stop_sel='button[aria-label*="Stop"], button[aria-label*="Detener"]',
+        print(
+            f"[Claude] prompt enviado en {send_elapsed:.2f}s",
+            flush=True,
         )
 
-        # Extraer respuesta de Claude
-        return await self._extract_last_message(
+        response = await self._wait_claude_response(
             page,
-            selector_candidates=[
-                ".font-claude-message",
-                '[data-testid*="assistant-message"]',
-                '[data-testid*="message"]',
-            ],
+            before,
         )
 
-    async def _needs_login_claude(self, page) -> bool:
-        url = page.url.lower()
-        if "claude.ai/login" in url or "claude.ai/auth" in url:
-            return True
-        body = ""
-        try:
-            body = await page.locator("body").inner_text(timeout=5000)
-        except Exception:
-            pass
-        body_lower = body.lower()
-        composer = page.locator('.ProseMirror[contenteditable="true"]')
-        try:
-            if await composer.count() == 0 and (
-                "log in" in body_lower or "iniciar sesión" in body_lower
+        total = time.perf_counter() - total_start
+
+        print(
+            f"[Claude] respuesta recibida en {total:.2f}s",
+            flush=True,
+        )
+
+        return response
+
+    async def _wait_claude_response(
+        self,
+        page: Page,
+        before: str,
+    ) -> str:
+
+        start = time.perf_counter()
+
+        last = before
+        stable = 0
+
+        while time.perf_counter() - start < RESPONSE_TIMEOUT / 1000:
+
+            await asyncio.sleep(POLL_INTERVAL)
+
+            try:
+                current = await self._body_text(page)
+            except Exception:
+                continue
+
+            if not current:
+                continue
+
+            if current == last:
+                stable += 1
+            else:
+                stable = 0
+                last = current
+
+            if (
+                current != before
+                and stable >= STABLE_CHECKS
+                and not self._looks_like_still_generating(current)
             ):
-                return True
-        except Exception:
-            pass
-        return False
+                return self._extract_latest_response(
+                    current,
+                    before,
+                )
 
-    # ── Utilidades internas ──────────────────────────────────────────────
+        return self._extract_latest_response(
+            last,
+            before,
+        )
 
-    async def _get_page(self):
-        """Retorna la primera pestaña del contexto reutilizándola."""
-        if not self._context:
-            raise RuntimeError("ChatBrain no inicializado. Usa 'async with ChatBrain() as brain:'")
-        if self._context.pages:
-            return self._context.pages[0]
-        return await self._context.new_page()
+    # --------------------------------------------------------
+    # DETECCION DE "SIGUE GENERANDO"
+    # --------------------------------------------------------
 
-    async def _click_send_button(self, page, selectors: list[str]) -> bool:
-        """Intenta hacer click en un botón de envío. Devuelve True si lo encontró."""
-        for sel in selectors:
-            btn = page.locator(sel).first
-            try:
-                if await btn.count() > 0:
-                    # Esperar que esté habilitado
-                    await btn.wait_for(state="visible", timeout=3000)
-                    await asyncio.sleep(0.5)
-                    await btn.click(timeout=3000)
-                    return True
-            except Exception:
-                continue
-        return False
+    def _looks_like_still_generating(self, text: str) -> bool:
+        """
+        Heuristica: si alguna palabra de GENERATING_MARKERS aparece
+        cerca del final del texto visible, asumimos que el modelo
+        todavia esta en estado de "pensando" y NO se debe considerar
+        la respuesta como estable/completa todavia.
+        """
+        if not text:
+            return False
+        cola = text[-300:]
+        return any(marker in cola for marker in GENERATING_MARKERS)
 
-    async def _wait_stream_end(self, page, stop_sel: str):
-        """Espera que termine el streaming de la respuesta."""
-        # Esperar a que aparezca el botón de parar
-        stop_btn = page.locator(stop_sel).first
-        try:
-            await stop_btn.wait_for(state="visible", timeout=15_000)
-        except Exception:
-            # Puede que la respuesta sea instantánea o el botón no aparezca
-            pass
+    # --------------------------------------------------------
+    # RESPONSE EXTRACTION
+    # --------------------------------------------------------
 
-        # Esperar a que desaparezca
-        try:
-            await stop_btn.wait_for(state="detached", timeout=STREAM_TIMEOUT_MS)
-        except Exception:
-            pass
+    def _extract_latest_response(
+        self,
+        current: str,
+        before: str,
+    ) -> str:
 
-        # Buffer adicional para que el DOM se asiente
-        await page.wait_for_timeout(EXTRA_BUFFER_MS)
+        if not current:
+            return ""
 
-    async def _extract_last_message(self, page, selector_candidates: list[str]) -> str:
-        """Extrae el texto del último mensaje de asistente en la página."""
-        for sel in selector_candidates:
-            locator = page.locator(sel)
-            try:
-                count = await locator.count()
-                if count > 0:
-                    text = await locator.last.inner_text(timeout=5000)
-                    if text and text.strip():
-                        return text.strip()
-            except Exception:
-                continue
+        if not before:
+            return current.strip()
 
-        # Fallback: intentar obtener cualquier contenido del chat
-        try:
-            body = await page.locator("main").inner_text(timeout=5000)
-            if body:
-                return body.strip()
-        except Exception:
-            pass
+        # Diferencia simple contra el body anterior.
+        if current.startswith(before):
+            result = current[len(before):].strip()
 
-        return "(no se pudo extraer la respuesta)"
+            if result:
+                return result
 
-# ── Script de prueba ────────────────────────────────────────────────────────
+        # Fallback: devolver body completo.
+        return current.strip()
+
+    # --------------------------------------------------------
+    # COMPATIBILITY WRAPPERS
+    # --------------------------------------------------------
+
+    async def ask_chatgpt(self, text: str) -> str:
+        """
+        Compatibilidad con reasoning_loop.py.
+        """
+        return await self.chatgpt(text)
+
+    async def ask_claude(self, text: str) -> str:
+        """
+        Compatibilidad con reasoning_loop.py.
+        """
+        return await self.claude(text)
+
+
+# ------------------------------------------------------------
+# TEST DIRECTO
+# ------------------------------------------------------------
+
+async def _test():
+
+    print("")
+    print("=" * 60)
+    print(" CHAT BRAIN FAST - TEST")
+    print("=" * 60)
+    print("")
+
+    start = time.perf_counter()
+
+    async with ChatBrain() as brain:
+
+        print("")
+        print("[TEST] ChatGPT...")
+        print("")
+
+        response1 = await brain.ask_chatgpt(
+            "Responde solamente: CHATGPT_OK"
+        )
+
+        print("")
+        print("CHATGPT RESULT:")
+        print(response1[:1000])
+
+        print("")
+        print("[TEST] Claude...")
+        print("")
+
+        response2 = await brain.ask_claude(
+            "Responde solamente: CLAUDE_OK"
+        )
+
+        print("")
+        print("CLAUDE RESULT:")
+        print(response2[:1000])
+
+    total = time.perf_counter() - start
+
+    print("")
+    print("=" * 60)
+    print(f"TIEMPO TOTAL: {total:.2f}s")
+    print("=" * 60)
+    print("")
+
 
 if __name__ == "__main__":
-    import sys
-
-    async def _test():
-        msg = (
-            sys.argv[1]
-            if len(sys.argv) > 1
-            else "Responde únicamente: OK"
-        )
-
-        async with ChatBrain() as brain:
-            print("[TEST] Probando ChatGPT...")
-            r1 = await brain.chatgpt(msg)
-            print(f"[CHATGPT] {r1[:300]}")
-
-            print("\n[TEST] Probando Claude...")
-            r2 = await brain.claude(msg)
-            print(f"[CLAUDE] {r2[:300]}")
-
-            print("\n[TEST] ChatGPT + Claude: OK")
-
     asyncio.run(_test())

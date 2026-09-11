@@ -1,0 +1,140 @@
+{
+  "index": 7,
+  "created_at": "2026-09-10 05:11:19",
+  "model": "qwen3:1.7b",
+  "task": "Open https://example.com, read the page, and report the page title and URL. Then stop.",
+  "expected": "example domain",
+  "settings": {
+    "max_steps": 10,
+    "max_failures": 3,
+    "extra_prompt": true,
+    "num_ctx": 8192,
+    "num_predict": 1024,
+    "headless": true,
+    "acl_actions": [
+      "click",
+      "done",
+      "extract",
+      "find_elements",
+      "go_back",
+      "input",
+      "navigate",
+      "scroll",
+      "search",
+      "wait"
+    ],
+    "state_timeout_s": "90",
+    "retry_max": 3,
+    "retry_backoff_s": [
+      1,
+      2,
+      4
+    ]
+  },
+  "done": true,
+  "successful": true,
+  "verified": true,
+  "passed": true,
+  "text_match": true,
+  "real_match": true,
+  "observed_title": "Example Domain",
+  "observed_url": "https://example.com/",
+  "final_result": "Example Domain",
+  "errors": [],
+  "failure_type": "success",
+  "attempts": [
+    {
+      "attempt": 1,
+      "done": true,
+      "elapsed_s": 22.54,
+      "errors": []
+    }
+  ],
+  "retries": [],
+  "callback_error": null,
+  "steps": 3,
+  "elapsed_s": 22.54,
+  "trace": [
+    {
+      "url": "https://example.com",
+      "actions": [
+        {
+          "navigate": {
+            "url": "https://example.com",
+            "new_tab": false
+          }
+        }
+      ],
+      "result": [
+        {
+          "is_done": false,
+          "success": null,
+          "judgement": null,
+          "error": null,
+          "attachments": null,
+          "images": null,
+          "long_term_memory": "Found initial url and automatically loaded it. REAL title of the loaded page document.title = &quot;Example Domain&quot; | REAL url = https://example.com/.",
+          "extracted_content": "🔗 Navigated to https://example.com\n[REAL_TITLE] Trusted <title> from CDP: &quot;Example Domain&quot;. Report THIS exact title in done.text.",
+          "include_extracted_content_only_once": false,
+          "metadata": null,
+          "include_in_memory": true
+        }
+      ]
+    },
+    {
+      "url": "https://example.com/",
+      "actions": [
+        {
+          "navigate": {
+            "url": "https://example.com/",
+            "new_tab": false
+          }
+        }
+      ],
+      "result": [
+        {
+          "is_done": false,
+          "success": null,
+          "judgement": null,
+          "error": null,
+          "attachments": null,
+          "images": null,
+          "long_term_memory": "ALREADY on https://example.com/ (navigated to it earlier in this session). The page is already loaded. The title and URL are known. Your next and ONLY action must be done with the observed values.",
+          "extracted_content": "ALREADY on https://example.com/ (navigated to it earlier in this session). The page is already loaded. The title and URL are known. Your next and ONLY action must be done with the observed values.",
+          "include_extracted_content_only_once": false,
+          "metadata": null,
+          "include_in_memory": false
+        }
+      ]
+    },
+    {
+      "url": "https://example.com/",
+      "actions": [
+        {
+          "done": {
+            "text": "Example Domain",
+            "success": true,
+            "files_to_display": [
+              "https://example.com/"
+            ]
+          }
+        }
+      ],
+      "result": [
+        {
+          "is_done": true,
+          "success": true,
+          "judgement": null,
+          "error": null,
+          "attachments": [],
+          "images": null,
+          "long_term_memory": "Task completed: True - Example Domain",
+          "extracted_content": "Example Domain",
+          "include_extracted_content_only_once": false,
+          "metadata": null,
+          "include_in_memory": false
+        }
+      ]
+    }
+  ]
+}

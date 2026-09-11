@@ -1,0 +1,31 @@
+{
+  "model": "qwen3:1.7b",
+  "runs": 2,
+  "done": 2,
+  "verified": 2,
+  "passed": 2,
+  "success_rate": 100.0,
+  "failure_breakdown": {
+    "success": 2
+  },
+  "results": [
+    {
+      "index": 1,
+      "passed": true,
+      "verified": true,
+      "failure_type": "success",
+      "steps": 4,
+      "elapsed_s": 35.01,
+      "final_result": "Example Domain"
+    },
+    {
+      "index": 2,
+      "passed": true,
+      "verified": true,
+      "failure_type": "success",
+      "steps": 3,
+      "elapsed_s": 37.74,
+      "final_result": "Example Domain"
+    }
+  ]
+}

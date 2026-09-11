@@ -1,0 +1,266 @@
+{
+  "index": 3,
+  "created_at": "2026-09-10 01:48:16",
+  "model": "qwen3:1.7b",
+  "task": "Open https://example.com, read the page, and report the page title and URL. Then stop.",
+  "expected": "Example Domain",
+  "settings": {
+    "max_steps": 10,
+    "max_failures": 3,
+    "extra_prompt": true,
+    "num_ctx": 8192,
+    "num_predict": 1024,
+    "headless": true,
+    "acl_actions": [
+      "click",
+      "done",
+      "extract",
+      "find_elements",
+      "go_back",
+      "input",
+      "navigate",
+      "scroll",
+      "search",
+      "wait"
+    ]
+  },
+  "done": false,
+  "successful": null,
+  "passed": false,
+  "final_result": "",
+  "errors": [
+    "Navigation failed: Expected at least one handler to return a non-None result, but none did! ?▶ BrowserStateRequestEvent#2b94 ✅ -> {'2602472276048.2602497822208': browser_use.browser.watchdog_base.DownloadsWatchdog.on_BrowserStateRequestEvent#2208() ✅, '2602472276048.2602500331600': browser_use.browser.watchdog_base.DOMWatchdog.on_BrowserStateRequestEvent#1600() ✅}",
+    "Failed to complete task in maximum steps"
+  ],
+  "steps": 9,
+  "elapsed_s": 92.72,
+  "trace": [
+    {
+      "url": "https://example.com",
+      "actions": [
+        {
+          "navigate": {
+            "url": "https://example.com",
+            "new_tab": false
+          }
+        }
+      ],
+      "result": [
+        {
+          "is_done": false,
+          "success": null,
+          "judgement": null,
+          "error": null,
+          "attachments": null,
+          "images": null,
+          "long_term_memory": "Found initial url and automatically loaded it. Navigated to https://example.com",
+          "extracted_content": "🔗 Navigated to https://example.com",
+          "include_extracted_content_only_once": false,
+          "metadata": null,
+          "include_in_memory": false
+        }
+      ]
+    },
+    {
+      "url": "https://example.com/",
+      "actions": [
+        {
+          "navigate": {
+            "url": "https://example.com",
+            "new_tab": false
+          }
+        }
+      ],
+      "result": [
+        {
+          "is_done": false,
+          "success": null,
+          "judgement": null,
+          "error": null,
+          "attachments": null,
+          "images": null,
+          "long_term_memory": "Navigated to https://example.com",
+          "extracted_content": "🔗 Navigated to https://example.com",
+          "include_extracted_content_only_once": false,
+          "metadata": null,
+          "include_in_memory": false
+        }
+      ]
+    },
+    {
+      "url": "https://example.com/",
+      "actions": [
+        {
+          "navigate": {
+            "url": "https://example.com",
+            "new_tab": false
+          }
+        }
+      ],
+      "result": [
+        {
+          "is_done": false,
+          "success": null,
+          "judgement": null,
+          "error": null,
+          "attachments": null,
+          "images": null,
+          "long_term_memory": "Navigated to https://example.com",
+          "extracted_content": "🔗 Navigated to https://example.com",
+          "include_extracted_content_only_once": false,
+          "metadata": null,
+          "include_in_memory": false
+        }
+      ]
+    },
+    {
+      "url": "https://example.com/",
+      "actions": [
+        {
+          "navigate": {
+            "url": "https://example.com",
+            "new_tab": false
+          }
+        }
+      ],
+      "result": [
+        {
+          "is_done": false,
+          "success": null,
+          "judgement": null,
+          "error": null,
+          "attachments": null,
+          "images": null,
+          "long_term_memory": "Navigated to https://example.com",
+          "extracted_content": "🔗 Navigated to https://example.com",
+          "include_extracted_content_only_once": false,
+          "metadata": null,
+          "include_in_memory": false
+        }
+      ]
+    },
+    {
+      "url": "https://example.com/",
+      "actions": [
+        {
+          "navigate": {
+            "url": "https://example.com",
+            "new_tab": false
+          }
+        }
+      ],
+      "result": [
+        {
+          "is_done": false,
+          "success": null,
+          "judgement": null,
+          "error": null,
+          "attachments": null,
+          "images": null,
+          "long_term_memory": "Navigated to https://example.com",
+          "extracted_content": "🔗 Navigated to https://example.com",
+          "include_extracted_content_only_once": false,
+          "metadata": null,
+          "include_in_memory": false
+        }
+      ]
+    },
+    {
+      "url": "https://example.com/",
+      "actions": [
+        {
+          "navigate": {
+            "url": "https://example.com",
+            "new_tab": false
+          }
+        }
+      ],
+      "result": [
+        {
+          "is_done": false,
+          "success": null,
+          "judgement": null,
+          "error": null,
+          "attachments": null,
+          "images": null,
+          "long_term_memory": "Navigated to https://example.com",
+          "extracted_content": "🔗 Navigated to https://example.com",
+          "include_extracted_content_only_once": false,
+          "metadata": null,
+          "include_in_memory": false
+        }
+      ]
+    },
+    {
+      "url": "https://example.com/",
+      "actions": [
+        {
+          "navigate": {
+            "url": "https://example.com",
+            "new_tab": false
+          }
+        }
+      ],
+      "result": [
+        {
+          "is_done": false,
+          "success": null,
+          "judgement": null,
+          "error": null,
+          "attachments": null,
+          "images": null,
+          "long_term_memory": "Navigated to https://example.com",
+          "extracted_content": "🔗 Navigated to https://example.com",
+          "include_extracted_content_only_once": false,
+          "metadata": null,
+          "include_in_memory": false
+        }
+      ]
+    },
+    {
+      "url": "https://example.com/",
+      "actions": [
+        {
+          "navigate": {
+            "url": "https://example.com",
+            "new_tab": false
+          }
+        }
+      ],
+      "result": [
+        {
+          "is_done": false,
+          "success": null,
+          "judgement": null,
+          "error": "Navigation failed: Expected at least one handler to return a non-None result, but none did! ?▶ BrowserStateRequestEvent#2b94 ✅ -> {'2602472276048.2602497822208': browser_use.browser.watchdog_base.DownloadsWatchdog.on_BrowserStateRequestEvent#2208() ✅, '2602472276048.2602500331600': browser_use.browser.watchdog_base.DOMWatchdog.on_BrowserStateRequestEvent#1600() ✅}",
+          "attachments": null,
+          "images": null,
+          "long_term_memory": null,
+          "extracted_content": null,
+          "include_extracted_content_only_once": false,
+          "metadata": null,
+          "include_in_memory": false
+        }
+      ]
+    },
+    {
+      "url": "",
+      "actions": [],
+      "result": [
+        {
+          "is_done": false,
+          "success": null,
+          "judgement": null,
+          "error": "Failed to complete task in maximum steps",
+          "attachments": null,
+          "images": null,
+          "long_term_memory": null,
+          "extracted_content": null,
+          "include_extracted_content_only_once": false,
+          "metadata": null,
+          "include_in_memory": true
+        }
+      ]
+    }
+  ]
+}

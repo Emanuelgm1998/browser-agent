@@ -1,0 +1,258 @@
+{
+  "run_id": "qwen3_1.7b_T9_07_20260911_033325",
+  "benchmark_version": "0.2",
+  "task_id": "T9",
+  "tier": 3,
+  "task_name": "Comparison task",
+  "model": "qwen3:1.7b",
+  "model_family": "qwen3",
+  "experiment_condition": "B",
+  "include_attributes": [
+    "title",
+    "type",
+    "checked",
+    "id",
+    "name",
+    "role",
+    "value",
+    "placeholder",
+    "data-date-format",
+    "alt",
+    "aria-label",
+    "aria-expanded",
+    "data-state",
+    "aria-checked",
+    "aria-valuemin",
+    "aria-valuemax",
+    "aria-valuenow",
+    "aria-placeholder",
+    "pattern",
+    "min",
+    "max",
+    "minlength",
+    "maxlength",
+    "step",
+    "accept",
+    "multiple",
+    "inputmode",
+    "autocomplete",
+    "aria-autocomplete",
+    "list",
+    "data-mask",
+    "data-inputmask",
+    "data-datepicker",
+    "format",
+    "expected_format",
+    "contenteditable",
+    "pseudo",
+    "checked",
+    "selected",
+    "expanded",
+    "pressed",
+    "disabled",
+    "invalid",
+    "valuemin",
+    "valuemax",
+    "valuenow",
+    "keyshortcuts",
+    "haspopup",
+    "multiselectable",
+    "required",
+    "valuetext",
+    "level",
+    "busy",
+    "live",
+    "ax_name",
+    "href"
+  ],
+  "timestamp": "2026-09-11T03:33:25",
+  "done": true,
+  "success": false,
+  "verified": false,
+  "verified_all": false,
+  "destination_ok": true,
+  "data_ok": false,
+  "synthesis_ok": false,
+  "failure_category": "extraction_failure",
+  "steps": 10,
+  "max_steps": 18,
+  "time_seconds": 280.47,
+  "timeout": false,
+  "attempts": 1,
+  "retries": 0,
+  "recovery_events": 0,
+  "retry_delay_total": 0,
+  "navigation_retries": 6,
+  "recovery_success": false,
+  "recovery_failed": false,
+  "navigation_count": 9,
+  "final_url": "http://127.0.0.1:61405/compare_b.html",
+  "observed_title": "BetaShine",
+  "final_result": "AlphaGlow",
+  "errors": [
+    "BLOCKED: you already navigated to http://127.0.0.1:61405/compare_b.html and it is already loaded. Re-navigating is a CRITICAL ERROR. Do NOT call navigate again. The required title and URL are already in your memory: call done now with the observed values."
+  ],
+  "trace_actions": {
+    "navigate": 9,
+    "done": 1
+  },
+  "visited_urls": [
+    "http://127.0.0.1:61405/compare_index.html",
+    "http://127.0.0.1:61405/compare_index.html",
+    "http://127.0.0.1:61405/compare_a.html",
+    "http://127.0.0.1:61405/compare_b.html",
+    "http://127.0.0.1:61405/compare_b.html",
+    "http://127.0.0.1:61405/compare_b.html",
+    "http://127.0.0.1:61405/compare_b.html",
+    "http://127.0.0.1:61405/compare_b.html",
+    "http://127.0.0.1:61405/compare_b.html",
+    "http://127.0.0.1:61405/compare_b.html"
+  ],
+  "verification_details": {
+    "destination": [
+      {
+        "ok": true,
+        "expected": [
+          "compare_a.html",
+          "compare_b.html"
+        ],
+        "actual": [
+          "/compare_index.html",
+          "/compare_index.html",
+          "/compare_a.html",
+          "/compare_b.html",
+          "/compare_b.html",
+          "/compare_b.html",
+          "/compare_b.html",
+          "/compare_b.html",
+          "/compare_b.html",
+          "/compare_b.html"
+        ],
+        "note": null,
+        "check": {
+          "type": "multi_url_reached",
+          "urls": [
+            "compare_a.html",
+            "compare_b.html"
+          ]
+        }
+      }
+    ],
+    "data": [
+      {
+        "ok": false,
+        "expected": [
+          "$99"
+        ],
+        "actual": {
+          "final": "AlphaGlow",
+          "dom_found": null
+        },
+        "note": "missing=$99",
+        "check": {
+          "type": "text_contains",
+          "expected": "$99",
+          "where": "final"
+        }
+      },
+      {
+        "ok": false,
+        "expected": [
+          "$79"
+        ],
+        "actual": {
+          "final": "AlphaGlow",
+          "dom_found": null
+        },
+        "note": "missing=$79",
+        "check": {
+          "type": "text_contains",
+          "expected": "$79",
+          "where": "final"
+        }
+      },
+      {
+        "ok": false,
+        "expected": [
+          "2000"
+        ],
+        "actual": {
+          "final": "AlphaGlow",
+          "dom_found": null
+        },
+        "note": "missing=2000",
+        "check": {
+          "type": "text_contains",
+          "expected": "2000",
+          "where": "final"
+        }
+      },
+      {
+        "ok": false,
+        "expected": [
+          "2200"
+        ],
+        "actual": {
+          "final": "AlphaGlow",
+          "dom_found": null
+        },
+        "note": "missing=2200",
+        "check": {
+          "type": "text_contains",
+          "expected": "2200",
+          "where": "final"
+        }
+      },
+      {
+        "ok": false,
+        "expected": [
+          "$99",
+          "$79"
+        ],
+        "actual": "betashine betashine 2200 lumens, portable $79",
+        "check": {
+          "type": "source_data_match",
+          "expected": [
+            "$99",
+            "$79"
+          ]
+        }
+      }
+    ],
+    "synthesis": [
+      {
+        "ok": false,
+        "expected": [
+          "BetaShine"
+        ],
+        "actual": {
+          "final": "AlphaGlow",
+          "dom_found": null
+        },
+        "note": "missing=BetaShine",
+        "check": {
+          "type": "text_contains",
+          "expected": "BetaShine",
+          "where": "final"
+        }
+      },
+      {
+        "ok": false,
+        "expected": [
+          "$79"
+        ],
+        "actual": {
+          "final": "AlphaGlow",
+          "dom_found": null
+        },
+        "note": "missing=$79",
+        "check": {
+          "type": "text_contains",
+          "expected": "$79",
+          "where": "final"
+        }
+      }
+    ]
+  },
+  "done_false_positive": true
+}

@@ -1,0 +1,369 @@
+﻿from __future__ import annotations
+
+import asyncio
+import json
+import re
+import sys
+from datetime import datetime
+from pathlib import Path
+from typing import Any
+
+from pydantic import BaseModel, Field, ValidationError
+
+from chat_brain import ChatBrain
+
+
+BASE_DIR = Path(__file__).resolve().parent
+LOG_DIR = BASE_DIR / "logs"
+LOG_DIR.mkdir(exist_ok=True)
+
+
+class PlanStep(BaseModel):
+    action: str
+    description: str
+    target: str | None = None
+
+
+class FinalPlan(BaseModel):
+    goal: str
+    summary: str
+    steps: list[PlanStep] = Field(min_length=1)
+    risks: list[str] = Field(default_factory=list)
+    requires_human_approval: bool = True
+
+
+def extract_json(text: str) -> dict[str, Any]:
+    text = text.strip()
+
+    # Direct JSON
+    try:
+        value = json.loads(text)
+        if isinstance(value, dict):
+            return value
+    except Exception:
+        pass
+
+    # JSON inside markdown code block
+    match = re.search(r"```(?:json)?\s*(\{.*?\})\s*```", text, re.DOTALL)
+    if match:
+        try:
+            value = json.loads(match.group(1))
+            if isinstance(value, dict):
+                return value
+        except Exception:
+            pass
+
+    # First balanced JSON object
+    start = text.find("{")
+    if start >= 0:
+        depth = 0
+        in_string = False
+        escaped = False
+
+        for i in range(start, len(text)):
+            char = text[i]
+
+            if in_string:
+                if escaped:
+                    escaped = False
+                elif char == "\\":
+                    escaped = True
+                elif char == '"':
+                    in_string = False
+                continue
+
+            if char == '"':
+                in_string = True
+            elif char == "{":
+                depth += 1
+            elif char == "}":
+                depth -= 1
+                if depth == 0:
+                    candidate = text[start:i + 1]
+                    try:
+                        value = json.loads(candidate)
+                        if isinstance(value, dict):
+                            return value
+                    except Exception:
+                        break
+
+    raise ValueError("No se encontró JSON válido en la respuesta.")
+
+
+def validate_plan(text: str) -> FinalPlan:
+    data = extract_json(text)
+    return FinalPlan.model_validate(data)
+
+
+async def call_brain(brain: ChatBrain, method_name: str, prompt: str) -> str:
+    method = getattr(brain, method_name)
+
+    result = method(prompt)
+
+    if asyncio.iscoroutine(result):
+        result = await result
+
+    if not isinstance(result, str):
+        result = str(result)
+
+    return result.strip()
+
+
+async def run_reasoning(task: str) -> FinalPlan:
+        print()
+        print("=" * 70)
+        print("BROWSER AGENT IA - DUAL BRAIN REASONING")
+        print("=" * 70)
+        print(f"Tarea: {task}")
+        print()
+
+        async with ChatBrain() as brain:
+
+            # ------------------------------------------------------------
+            # 1. ChatGPT: plan inicial
+            # ------------------------------------------------------------
+        print("[1/3] ChatGPT -> PLAN INICIAL")
+
+        chatgpt_prompt = f"""
+    Eres el planificador principal de un Browser Agent IA.
+
+    Debes analizar esta tarea:
+
+    {task}
+
+    Diseña un plan práctico para que otro agente pueda ejecutarla
+    usando un navegador.
+
+    Incluye:
+    - objetivo
+    - pasos concretos
+    - acciones de navegador
+    - datos que deben verificarse
+    - riesgos o ambigüedades
+
+    Todavía NO ejecutes nada.
+    Devuelve una explicación clara del plan.
+    """
+
+        initial_plan = await call_brain(
+            brain,
+            "ask_chatgpt",
+            chatgpt_prompt,
+        )
+
+        print()
+        print("CHATGPT:")
+        print(initial_plan)
+        print()
+
+        # ------------------------------------------------------------
+        # 2. Claude: revisión
+        # ------------------------------------------------------------
+        print("[2/3] Claude -> REVIEW")
+
+        claude_prompt = f"""
+    Eres el revisor de seguridad y calidad de un Browser Agent IA.
+
+    Tarea original:
+    {task}
+
+    Plan propuesto por ChatGPT:
+    {initial_plan}
+
+    Revisa el plan.
+
+    Busca:
+    - pasos innecesarios
+    - errores lógicos
+    - acciones ambiguas
+    - riesgos
+    - verificaciones faltantes
+    - posibles problemas de navegación
+    - acciones que deberían requerir aprobación humana
+
+    Propón correcciones concretas.
+
+    Todavía NO ejecutes nada.
+    """
+
+        claude_review = await call_brain(
+            brain,
+            "ask_claude",
+            claude_prompt,
+        )
+
+        print()
+        print("CLAUDE:")
+        print(claude_review)
+        print()
+
+        # ------------------------------------------------------------
+        # 3. ChatGPT: plan final estructurado
+        # ------------------------------------------------------------
+        print("[3/3] ChatGPT -> PLAN FINAL JSON")
+
+        final_prompt = f"""
+    Eres el planificador final de un Browser Agent IA.
+
+    TAREA:
+    {task}
+
+    PLAN INICIAL DE CHATGPT:
+    {initial_plan}
+
+    REVISIÓN DE CLAUDE:
+    {claude_review}
+
+    Genera el plan FINAL.
+
+    IMPORTANTE:
+    - No ejecutes la tarea.
+    - No inventes resultados.
+    - El plan debe ser ejecutable por un agente de navegador.
+    - Incluye verificaciones.
+    - Si existe una acción sensible, marca que requiere aprobación humana.
+    - Devuelve ÚNICAMENTE JSON válido.
+    - No uses markdown.
+    - No agregues explicaciones fuera del JSON.
+
+    Formato EXACTO:
+
+    {{
+      "goal": "objetivo",
+      "summary": "resumen",
+      "steps": [
+        {{
+          "action": "navigate",
+          "description": "descripción",
+          "target": "https://example.com"
+        }}
+      ],
+      "risks": [],
+      "requires_human_approval": true
+    }}
+    """
+
+        final_response = await call_brain(
+            brain,
+            "ask_chatgpt",
+            final_prompt,
+        )
+
+        print()
+        print("CHATGPT PLAN FINAL RAW:")
+        print(final_response)
+        print()
+
+        # ------------------------------------------------------------
+        # 4. Validación Pydantic
+        # ------------------------------------------------------------
+        print("[VALIDACIÓN] Analizando JSON...")
+
+        try:
+            plan = validate_plan(final_response)
+        except (ValueError, ValidationError) as exc:
+            print()
+            print("ERROR: El plan final no pasó la validación.")
+            print(exc)
+            raise
+
+        print("OK: JSON válido.")
+        print()
+
+        # ------------------------------------------------------------
+        # 5. Mostrar plan estructurado
+        # ------------------------------------------------------------
+        print("=" * 70)
+        print("PLAN FINAL VALIDADO")
+        print("=" * 70)
+        print(json.dumps(
+            plan.model_dump(),
+            indent=2,
+            ensure_ascii=False,
+        ))
+        print("=" * 70)
+
+        # ------------------------------------------------------------
+        # 6. Guardar observabilidad
+        # ------------------------------------------------------------
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        log_path = LOG_DIR / f"reasoning_{timestamp}.json"
+
+        log_data = {
+            "timestamp": datetime.now().isoformat(),
+            "task": task,
+            "chatgpt_initial": initial_plan,
+            "claude_review": claude_review,
+            "chatgpt_final_raw": final_response,
+            "validated_plan": plan.model_dump(),
+            "execution": {
+                "status": "NOT_EXECUTED",
+                "reason": "MVP-1 reasoning test; human gate before browser execution",
+            },
+        }
+
+        log_path.write_text(
+            json.dumps(
+                log_data,
+                indent=2,
+                ensure_ascii=False,
+            ),
+            encoding="utf-8",
+        )
+
+        print()
+        print(f"LOG: {log_path}")
+
+        # ------------------------------------------------------------
+        # 7. Human approval gate
+        # ------------------------------------------------------------
+        print()
+        print("=" * 70)
+        print("APROBACIÓN HUMANA")
+        print("=" * 70)
+
+        if plan.requires_human_approval:
+            answer = input("¿Aprobar este plan? [y/N]: ").strip().lower()
+
+            if answer not in {"y", "yes", "s", "si", "sí"}:
+                print("Plan rechazado por el usuario.")
+                return plan
+
+            print("Plan aprobado.")
+        else:
+            print("El plan no requiere aprobación humana.")
+
+        # Todavía NO conectamos el executor.
+        print()
+        print("EXECUTION STATUS: PENDING")
+        print("El executor Browser Agent todavía no se ejecuta en esta fase.")
+
+        return plan
+
+
+def main() -> None:
+    if len(sys.argv) > 1:
+        task = " ".join(sys.argv[1:]).strip()
+    else:
+        task = (
+            "Abre example.com, obtiene el título de la página "
+            "y verifica que el título obtenido es correcto."
+        )
+
+    try:
+        asyncio.run(run_reasoning(task))
+    except KeyboardInterrupt:
+        print()
+        print("Proceso cancelado por el usuario.")
+        raise SystemExit(130)
+    except Exception as exc:
+        print()
+        print("=" * 70)
+        print("REASONING LOOP ERROR")
+        print("=" * 70)
+        print(f"{type(exc).__name__}: {exc}")
+        raise SystemExit(1)
+
+
+if __name__ == "__main__":
+    main()

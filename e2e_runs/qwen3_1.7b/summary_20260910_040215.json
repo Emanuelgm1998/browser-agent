@@ -1,0 +1,59 @@
+{
+  "model": "qwen3:1.7b",
+  "runs": 5,
+  "done": 5,
+  "verified": 4,
+  "passed": 4,
+  "success_rate": 80.0,
+  "failure_breakdown": {
+    "success": 4,
+    "verification_mismatch": 1
+  },
+  "results": [
+    {
+      "index": 1,
+      "passed": true,
+      "verified": true,
+      "failure_type": "success",
+      "steps": 4,
+      "elapsed_s": 38.88,
+      "final_result": "Example Domain"
+    },
+    {
+      "index": 2,
+      "passed": true,
+      "verified": true,
+      "failure_type": "success",
+      "steps": 3,
+      "elapsed_s": 27.27,
+      "final_result": "Page title: 'Example Domain', URL: https://example.com"
+    },
+    {
+      "index": 3,
+      "passed": true,
+      "verified": true,
+      "failure_type": "success",
+      "steps": 3,
+      "elapsed_s": 28.47,
+      "final_result": "Example Domain"
+    },
+    {
+      "index": 4,
+      "passed": false,
+      "verified": false,
+      "failure_type": "verification_mismatch",
+      "steps": 3,
+      "elapsed_s": 29.89,
+      "final_result": "https://example.com"
+    },
+    {
+      "index": 5,
+      "passed": true,
+      "verified": true,
+      "failure_type": "success",
+      "steps": 4,
+      "elapsed_s": 47.17,
+      "final_result": "Example Domain"
+    }
+  ]
+}

@@ -1,74 +1,14 @@
 [
   {
-    "texto": "Ayuda sobre la accesibilidad",
-    "url": "https://support.google.com/websearch/answer/181196?hl=es-CL"
+    "texto": "¿A qué se debe esto?",
+    "url": "#"
   },
   {
-    "texto": "Iniciar sesión",
-    "url": "https://accounts.google.com/ServiceLogin?hl=es&passive=true&continue=https://www.google.com/search%3Fq%3D%25C3%25B3pticas%2BChile%26sca_esv%3D6eead0851424f514%26source%3Dhp%26ei%3DK6Sgapv4MJPS1sQPmfai6Qc%26iflsig%3DABILxe8AAAAAaqCyO5gHl3jzzRMG3kuh6BQSlMAxiFCZ%26ved%3D0ahUKEwjbubWIm-CWAxUTqZUCHRm7KH0Q4dUDCBs%26uact%3D5%26oq%3D%25C3%25B3pticas%2BChile%26gs_lp%3DEgdnd3Mtd2l6Ig7Ds3B0aWNhcyBDaGlsZUgPUABYAHAAeACQAQCYAQCgAQCqAQC4AQPIAQD4AQGYAgCgAgCYAwCSBwCgBwCyBwC4BwDCBwDIBwCACAE%26sclient%3Dgws-wiz&ec=futura_srp_og_si_72236_p"
-  },
-  {
-    "texto": "Maps",
-    "url": "https://maps.google.com/maps?sca_esv=6eead0851424f514&output=search&q=%C3%B3pticas+Chile&source=lnms&fbs=ABfTbFUDadgeu2mn4mYJ8iEZ1GUDd8ABuXxNzQEi57SWOuuPdScLx3ol9c1cFkljSkR7a92zI41_RsweK3CN3tjl5tPsOx7E3VbULoOPEOsu9KhsAk3k7sdUvOYmdnbogVCCSWhmLxaQpm5UpaoN9TXvQh1HSyz1IuGDYdOIh-Mp3uF8pEA7-t0V4NLLz_QDqWn25CAYHoLj8aSer2OU5mS2efKPrV0IFQ&entry=mc&ved=1t:200715&ictx=111"
-  },
-  {
-    "texto": "Sitio web",
-    "url": "https://www.instagram.com/optica_chile_/"
+    "texto": "Condiciones del servicio",
+    "url": "//www.google.com/policies/terms/"
   },
   {
     "texto": "Más información",
-    "url": "https://support.google.com/websearch/answer/3338405"
-  },
-  {
-    "texto": "¿Eres propietario de esta empresa?",
-    "url": "https://business.google.com/create?hl=es&getstarted&authuser=0&fp=15369593091725910245&gmbsrc=cl-es-et-ip-mp-s-l~mkp%7Cclaimbz_aoc_a%7Crt_intercept_u&ppsrc=GMBSI"
-  },
-  {
-    "texto": "Denunciar un problema legal",
-    "url": "https://support.google.com/legal/troubleshooter/1114905#ts=9723198%2C7170398"
-  },
-  {
-    "texto": "Denunciar conducta del negocio",
-    "url": "https://support.google.com/maps/contact/14718793?url=https://maps.google.com/maps?cid%3D0x9662c5f6fffc5e73:0xd54bc37c3e9ee0e5"
-  },
-  {
-    "texto": "Más información",
-    "url": "https://support.google.com/websearch/answer/3338405"
-  },
-  {
-    "texto": "¿Eres propietario de esta empresa?",
-    "url": "https://business.google.com/create?hl=es&getstarted&authuser=0&fp=15369593091725910245&gmbsrc=cl-es-et-ip-z-gmb-s-z-l~skp%7Cclaimbz_aoc_a%7Cu&ppsrc=GMBSI"
-  },
-  {
-    "texto": "wa.me",
-    "url": "https://wa.me/56971267601"
-  },
-  {
-    "texto": "bmconsulting.cl",
-    "url": "https://www.bmconsulting.cl/Christine/modulos/OpticasChile/Agenda/index.php"
-  },
-  {
-    "texto": "Más información",
-    "url": "https://support.google.com/reserve?p=link_ranking&hl=es-CL"
-  },
-  {
-    "texto": "políticas de Google",
-    "url": "https://support.google.com/contributionpolicy/answer/7400114?ref_topic=7422769"
-  },
-  {
-    "texto": "Información sobre estos datos",
-    "url": "https://support.google.com/local-listings?p=how_google_sources"
-  },
-  {
-    "texto": "Ayuda",
-    "url": "https://support.google.com/websearch/?p=ws_results_help&hl=es-CL&fg=1"
-  },
-  {
-    "texto": "Privacidad",
-    "url": "https://policies.google.com/privacy?hl=es-CL&fg=1"
-  },
-  {
-    "texto": "Condiciones",
-    "url": "https://policies.google.com/terms?hl=es-CL&fg=1"
+    "url": "//support.google.com/websearch/answer/86640"
   }
 ]

@@ -1,0 +1,17 @@
+{
+  "model": "qwen3:1.7b",
+  "runs": 1,
+  "done": 1,
+  "passed": 1,
+  "success_rate": 100.0,
+  "results": [
+    {
+      "index": 1,
+      "passed": true,
+      "done": true,
+      "steps": 9,
+      "elapsed_s": 116.49,
+      "final_result": "Reported page title: 'Example Domain', URL: 'https://example.com'. Task completed."
+    }
+  ]
+}

@@ -1,0 +1,86 @@
+{
+  "run_id": "qwen3_1.7b_T1_01_20260910_225948",
+  "benchmark_version": "0.2",
+  "task_id": "T1",
+  "tier": 1,
+  "task_name": "Open URL + exact title",
+  "model": "qwen3:1.7b",
+  "model_family": "qwen3",
+  "timestamp": "2026-09-10T22:59:48",
+  "done": true,
+  "success": true,
+  "verified": true,
+  "verified_all": true,
+  "destination_ok": true,
+  "data_ok": true,
+  "synthesis_ok": null,
+  "failure_category": "success",
+  "steps": 3,
+  "max_steps": 8,
+  "time_seconds": 20.83,
+  "timeout": false,
+  "attempts": 1,
+  "retries": 0,
+  "recovery_events": 0,
+  "retry_delay_total": 0,
+  "navigation_retries": 1,
+  "recovery_success": false,
+  "recovery_failed": false,
+  "navigation_count": 2,
+  "final_url": "https://example.com/",
+  "observed_title": "Example Domain",
+  "final_result": "<title>Example Domain</title><url>https://example.com/></url>",
+  "errors": [],
+  "trace_actions": {
+    "navigate": 2,
+    "done": 1
+  },
+  "visited_urls": [
+    "https://example.com",
+    "https://example.com/",
+    "https://example.com/"
+  ],
+  "verification_details": {
+    "destination": [
+      {
+        "ok": true,
+        "expected": "Example Domain",
+        "actual": "Example Domain",
+        "check": {
+          "type": "title_exact",
+          "expected": "Example Domain"
+        }
+      },
+      {
+        "ok": true,
+        "expected": "https://example.com/",
+        "actual": "https://example.com/",
+        "check": {
+          "type": "final_url_equals",
+          "expected": "https://example.com/",
+          "mode": "suffix"
+        }
+      }
+    ],
+    "data": [
+      {
+        "ok": true,
+        "expected": [
+          "Example Domain"
+        ],
+        "actual": {
+          "final": "<title>Example Domain</title><url>https://example.com/></url>",
+          "dom_found": null
+        },
+        "note": "missing=",
+        "check": {
+          "type": "text_contains",
+          "expected": "Example Domain",
+          "where": "final"
+        }
+      }
+    ],
+    "synthesis": []
+  },
+  "done_false_positive": false
+}

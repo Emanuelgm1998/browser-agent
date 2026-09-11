@@ -1,0 +1,31 @@
+{
+  "model": "qwen3:1.7b",
+  "runs": 2,
+  "done": 2,
+  "verified": 0,
+  "passed": 0,
+  "success_rate": 0.0,
+  "failure_breakdown": {
+    "no_observed_title": 2
+  },
+  "results": [
+    {
+      "index": 1,
+      "passed": false,
+      "verified": false,
+      "failure_type": "no_observed_title",
+      "steps": 3,
+      "elapsed_s": 20.45,
+      "final_result": "https://example.com"
+    },
+    {
+      "index": 2,
+      "passed": false,
+      "verified": false,
+      "failure_type": "no_observed_title",
+      "steps": 4,
+      "elapsed_s": 31.98,
+      "final_result": "Example Domain"
+    }
+  ]
+}

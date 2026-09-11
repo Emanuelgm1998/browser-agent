@@ -1,0 +1,22 @@
+{
+  "model": "qwen3:1.7b",
+  "runs": 1,
+  "done": 1,
+  "verified": 0,
+  "passed": 0,
+  "success_rate": 0.0,
+  "failure_breakdown": {
+    "verification_mismatch": 1
+  },
+  "results": [
+    {
+      "index": 1,
+      "passed": false,
+      "verified": false,
+      "failure_type": "verification_mismatch",
+      "steps": 5,
+      "elapsed_s": 42.89,
+      "final_result": "https://example.com"
+    }
+  ]
+}

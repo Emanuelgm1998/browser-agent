@@ -1,0 +1,40 @@
+{
+  "model": "qwen3:1.7b",
+  "runs": 3,
+  "done": 3,
+  "verified": 3,
+  "passed": 3,
+  "success_rate": 100.0,
+  "failure_breakdown": {
+    "success": 3
+  },
+  "results": [
+    {
+      "index": 1,
+      "passed": true,
+      "verified": true,
+      "failure_type": "success",
+      "steps": 3,
+      "elapsed_s": 138.05,
+      "final_result": "<title>Welcome to Python.org</title><url>https://www.python.org/</url>"
+    },
+    {
+      "index": 2,
+      "passed": true,
+      "verified": true,
+      "failure_type": "success",
+      "steps": 3,
+      "elapsed_s": 149.11,
+      "final_result": "Welcome to Python.org"
+    },
+    {
+      "index": 3,
+      "passed": true,
+      "verified": true,
+      "failure_type": "success",
+      "steps": 3,
+      "elapsed_s": 138.02,
+      "final_result": "Welcome to Python.org"
+    }
+  ]
+}

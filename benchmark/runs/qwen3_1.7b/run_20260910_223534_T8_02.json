@@ -1,0 +1,144 @@
+{
+  "run_id": "qwen3_1.7b_T8_02_20260910_223534",
+  "benchmark_version": "0.2",
+  "task_id": "T8",
+  "tier": 3,
+  "task_name": "Structured research",
+  "model": "qwen3:1.7b",
+  "model_family": "qwen3",
+  "timestamp": "2026-09-10T22:35:34",
+  "done": true,
+  "success": false,
+  "verified": false,
+  "verified_all": false,
+  "destination_ok": false,
+  "data_ok": false,
+  "synthesis_ok": null,
+  "failure_category": "navigation_failure",
+  "steps": 3,
+  "max_steps": 18,
+  "time_seconds": 31.9,
+  "timeout": false,
+  "attempts": 1,
+  "retries": 0,
+  "recovery_events": 0,
+  "retry_delay_total": 0,
+  "navigation_retries": 1,
+  "recovery_success": false,
+  "recovery_failed": false,
+  "navigation_count": 2,
+  "final_url": "http://127.0.0.1:54431/research.html",
+  "observed_title": "Research Index",
+  "final_result": "http://127.0.0.1:54431/research.html",
+  "errors": [],
+  "trace_actions": {
+    "navigate": 2,
+    "done": 1
+  },
+  "visited_urls": [
+    "http://127.0.0.1:54431/research.html",
+    "http://127.0.0.1:54431/research.html",
+    "http://127.0.0.1:54431/research.html"
+  ],
+  "verification_details": {
+    "destination": [
+      {
+        "ok": true,
+        "expected": "Research Index",
+        "actual": "Research Index",
+        "check": {
+          "type": "title_exact",
+          "expected": "Research Index"
+        }
+      },
+      {
+        "ok": false,
+        "expected": [
+          "article1.html",
+          "article2.html",
+          "article3.html"
+        ],
+        "actual": [
+          "/research.html",
+          "/research.html",
+          "/research.html"
+        ],
+        "note": "missing=['article1.html', 'article2.html', 'article3.html']",
+        "check": {
+          "type": "multi_url_reached",
+          "urls": [
+            "article1.html",
+            "article2.html",
+            "article3.html"
+          ]
+        }
+      }
+    ],
+    "data": [
+      {
+        "ok": false,
+        "expected": {
+          "type": "structured_field_match",
+          "expected": [
+            {
+              "name": "Lumina Lamp",
+              "price": "$42",
+              "feature": "dimmable"
+            },
+            {
+              "name": "Lumina Desk",
+              "price": "$89",
+              "feature": "height-adjustable"
+            },
+            {
+              "name": "Lumina Strip",
+              "price": "$25",
+              "feature": "IP65 waterproof"
+            }
+          ]
+        },
+        "actual": null,
+        "note": "verifier_error: TypeError: 'NoneType' object is not subscriptable",
+        "check": {
+          "type": "structured_field_match",
+          "expected": [
+            {
+              "name": "Lumina Lamp",
+              "price": "$42",
+              "feature": "dimmable"
+            },
+            {
+              "name": "Lumina Desk",
+              "price": "$89",
+              "feature": "height-adjustable"
+            },
+            {
+              "name": "Lumina Strip",
+              "price": "$25",
+              "feature": "IP65 waterproof"
+            }
+          ]
+        }
+      },
+      {
+        "ok": true,
+        "expected": [
+          "Lumina Lamp",
+          "Lumina Desk",
+          "Lumina Strip"
+        ],
+        "actual": "product research lumina lamp lumina desk lumina strip",
+        "check": {
+          "type": "source_data_match",
+          "expected": [
+            "Lumina Lamp",
+            "Lumina Desk",
+            "Lumina Strip"
+          ]
+        }
+      }
+    ],
+    "synthesis": []
+  },
+  "done_false_positive": false
+}

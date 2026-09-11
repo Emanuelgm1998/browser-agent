@@ -1,0 +1,49 @@
+{
+  "model": "qwen3:1.7b",
+  "runs": 5,
+  "done": 5,
+  "passed": 3,
+  "success_rate": 60.0,
+  "results": [
+    {
+      "index": 1,
+      "passed": false,
+      "done": true,
+      "steps": 9,
+      "elapsed_s": 101.55,
+      "final_result": "Reported page title and URL: https://example.com/ - example.com"
+    },
+    {
+      "index": 2,
+      "passed": true,
+      "done": true,
+      "steps": 9,
+      "elapsed_s": 107.1,
+      "final_result": "Navigated to https://example.com, observed page title as 'Example Domain', and stopped as requested."
+    },
+    {
+      "index": 3,
+      "passed": false,
+      "done": true,
+      "steps": 9,
+      "elapsed_s": 118.31,
+      "final_result": "Report the page title and URL."
+    },
+    {
+      "index": 4,
+      "passed": true,
+      "done": true,
+      "steps": 9,
+      "elapsed_s": 131.97,
+      "final_result": "Reported the page title and URL: 'Example Domain' and 'https://example.com'. Task completed."
+    },
+    {
+      "index": 5,
+      "passed": true,
+      "done": true,
+      "steps": 9,
+      "elapsed_s": 200.54,
+      "final_result": "Reported page title: 'Example Domain', URL: 'https://example.com'. Task completed."
+    }
+  ]
+}

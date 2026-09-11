@@ -1,0 +1,40 @@
+{
+  "model": "qwen3:1.7b",
+  "runs": 3,
+  "done": 3,
+  "verified": 0,
+  "passed": 0,
+  "success_rate": 0.0,
+  "failure_breakdown": {
+    "verification_mismatch": 3
+  },
+  "results": [
+    {
+      "index": 1,
+      "passed": false,
+      "verified": false,
+      "failure_type": "verification_mismatch",
+      "steps": 3,
+      "elapsed_s": 154.58,
+      "final_result": "<title>Example Domain</title><meta http-equiv='Content-Type' content='text/html; charset=UTF-8' /><meta name='generator' content='Example Domain' /><meta name='description' content='This domain is for use in documentation examples without needing permission. Avoid use in operations.' /><meta name='keywords' content='example, domain, documentation, examples, no, permission, avoid, operations' /><link rel='canonical' href='https://example.com/' /><link rel='icon' href='https://example.com/favicon.ico' /><link rel='preconnect' href='https://example.com/' /><link rel='dns-prefetch' href='https://example.com/' /><link rel='apple-touch-icon' href='https://example.com/apple-touch-icon.png' /><link rel='apple-touch-icon' sizes='120x120' href='https://example.com/apple-touch-icon.png' /><link rel='apple-touch-icon' sizes='180x180' href='https://example.com/apple-touch-icon.png' /><link rel='icon' href='https://example.com/favicon.ico' /><link rel='manifest' href='https://example.com/manifest.json' /><meta name='viewport' content='width=device-width, initial-scale=1.0' /><body><p>This domain is for use in documentation examples without needing permission. Avoid use in operations.</p><a href='https://example.com/learn-more'>Learn more</a></body>"
+    },
+    {
+      "index": 2,
+      "passed": false,
+      "verified": false,
+      "failure_type": "verification_mismatch",
+      "steps": 4,
+      "elapsed_s": 50.61,
+      "final_result": "Example Domain"
+    },
+    {
+      "index": 3,
+      "passed": false,
+      "verified": false,
+      "failure_type": "verification_mismatch",
+      "steps": 3,
+      "elapsed_s": 26.45,
+      "final_result": "Page title: 'Example Domain', Page URL: https://example.com"
+    }
+  ]
+}

@@ -1,0 +1,104 @@
+{
+  "model": "qwen3:1.7b",
+  "runs": 10,
+  "done": 10,
+  "verified": 8,
+  "passed": 8,
+  "success_rate": 80.0,
+  "failure_breakdown": {
+    "success": 8,
+    "verification_mismatch": 2
+  },
+  "results": [
+    {
+      "index": 1,
+      "passed": true,
+      "verified": true,
+      "failure_type": "success",
+      "steps": 3,
+      "elapsed_s": 134.39,
+      "final_result": "<title>Welcome to Python.org</title> https://www.python.org/"
+    },
+    {
+      "index": 2,
+      "passed": true,
+      "verified": true,
+      "failure_type": "success",
+      "steps": 3,
+      "elapsed_s": 127.32,
+      "final_result": "The page title is 'Welcome to Python.org' and the URL is https://www.python.org/."
+    },
+    {
+      "index": 3,
+      "passed": true,
+      "verified": true,
+      "failure_type": "success",
+      "steps": 3,
+      "elapsed_s": 137.08,
+      "final_result": "Welcome to Python.org"
+    },
+    {
+      "index": 4,
+      "passed": true,
+      "verified": true,
+      "failure_type": "success",
+      "steps": 3,
+      "elapsed_s": 134.07,
+      "final_result": "The page title is 'Welcome to Python.org' and the URL is https://www.python.org/."
+    },
+    {
+      "index": 5,
+      "passed": true,
+      "verified": true,
+      "failure_type": "success",
+      "steps": 3,
+      "elapsed_s": 132.64,
+      "final_result": "Welcome to Python.org"
+    },
+    {
+      "index": 6,
+      "passed": false,
+      "verified": false,
+      "failure_type": "verification_mismatch",
+      "steps": 3,
+      "elapsed_s": 136.0,
+      "final_result": "<title>Python.org</title><url>https://www.python.org/</url>"
+    },
+    {
+      "index": 7,
+      "passed": false,
+      "verified": false,
+      "failure_type": "verification_mismatch",
+      "steps": 3,
+      "elapsed_s": 154.5,
+      "final_result": "<title>Python.org</title>"
+    },
+    {
+      "index": 8,
+      "passed": true,
+      "verified": true,
+      "failure_type": "success",
+      "steps": 3,
+      "elapsed_s": 136.36,
+      "final_result": "The page title is 'Welcome to Python.org' and the URL is https://www.python.org/."
+    },
+    {
+      "index": 9,
+      "passed": true,
+      "verified": true,
+      "failure_type": "success",
+      "steps": 3,
+      "elapsed_s": 135.09,
+      "final_result": "<title> Welcome to Python.org </title> https://www.python.org/ "
+    },
+    {
+      "index": 10,
+      "passed": true,
+      "verified": true,
+      "failure_type": "success",
+      "steps": 3,
+      "elapsed_s": 133.68,
+      "final_result": "The page title is 'Welcome to Python.org' and the URL is 'https://www.python.org/'. The task is complete."
+    }
+  ]
+}

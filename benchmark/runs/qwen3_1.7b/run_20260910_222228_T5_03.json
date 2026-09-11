@@ -1,0 +1,102 @@
+{
+  "run_id": "qwen3_1.7b_T5_03_20260910_222228",
+  "benchmark_version": "0.2",
+  "task_id": "T5",
+  "tier": 2,
+  "task_name": "Multi-step navigation",
+  "model": "qwen3:1.7b",
+  "model_family": "qwen3",
+  "timestamp": "2026-09-10T22:22:28",
+  "done": true,
+  "success": false,
+  "verified": false,
+  "verified_all": false,
+  "destination_ok": false,
+  "data_ok": false,
+  "synthesis_ok": null,
+  "failure_category": "interaction_failure",
+  "steps": 4,
+  "max_steps": 12,
+  "time_seconds": 49.92,
+  "timeout": false,
+  "attempts": 1,
+  "retries": 0,
+  "recovery_events": 0,
+  "retry_delay_total": 0,
+  "navigation_retries": 2,
+  "recovery_success": false,
+  "recovery_failed": false,
+  "navigation_count": 3,
+  "final_url": "http://127.0.0.1:54431/s5_start.html",
+  "observed_title": "Leg 1",
+  "final_result": "Leg 1",
+  "errors": [
+    "BLOCKED: you already navigated to http://127.0.0.1:54431/s5_start.html and it is already loaded. Re-navigating is a CRITICAL ERROR. Do NOT call navigate again. The required title and URL are already in your memory: call done now with the observed values."
+  ],
+  "trace_actions": {
+    "navigate": 3,
+    "done": 1
+  },
+  "visited_urls": [
+    "http://127.0.0.1:54431/s5_start.html",
+    "http://127.0.0.1:54431/s5_start.html",
+    "http://127.0.0.1:54431/s5_start.html",
+    "http://127.0.0.1:54431/s5_start.html"
+  ],
+  "verification_details": {
+    "destination": [
+      {
+        "ok": false,
+        "expected": "End Page",
+        "actual": "Leg 1",
+        "check": {
+          "type": "title_exact",
+          "expected": "End Page"
+        }
+      },
+      {
+        "ok": false,
+        "expected": "end.html",
+        "actual": "http://127.0.0.1:54431/s5_start.html",
+        "check": {
+          "type": "final_url_equals",
+          "expected": "end.html",
+          "mode": "suffix"
+        }
+      }
+    ],
+    "data": [
+      {
+        "ok": false,
+        "expected": [
+          "END_DATA_77"
+        ],
+        "actual": {
+          "final": "Leg 1",
+          "dom_found": null
+        },
+        "note": "missing=END_DATA_77",
+        "check": {
+          "type": "text_contains",
+          "expected": "END_DATA_77",
+          "where": "final"
+        }
+      },
+      {
+        "ok": false,
+        "expected": [
+          "END_DATA_77"
+        ],
+        "actual": "leg 1 step 2",
+        "check": {
+          "type": "source_data_match",
+          "expected": [
+            "END_DATA_77"
+          ]
+        }
+      }
+    ],
+    "synthesis": []
+  },
+  "done_false_positive": true
+}

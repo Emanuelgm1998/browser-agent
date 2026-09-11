@@ -1,0 +1,104 @@
+{
+  "model": "qwen3:1.7b",
+  "runs": 10,
+  "done": 10,
+  "verified": 7,
+  "passed": 7,
+  "success_rate": 70.0,
+  "failure_breakdown": {
+    "success": 7,
+    "verification_mismatch": 3
+  },
+  "results": [
+    {
+      "index": 1,
+      "passed": true,
+      "verified": true,
+      "failure_type": "success",
+      "steps": 4,
+      "elapsed_s": 54.45,
+      "final_result": "<title>Example Domain</title><url>https://example.com</url>"
+    },
+    {
+      "index": 2,
+      "passed": true,
+      "verified": true,
+      "failure_type": "success",
+      "steps": 3,
+      "elapsed_s": 30.1,
+      "final_result": "Example Domain"
+    },
+    {
+      "index": 3,
+      "passed": false,
+      "verified": false,
+      "failure_type": "verification_mismatch",
+      "steps": 3,
+      "elapsed_s": 29.77,
+      "final_result": "https://example.com"
+    },
+    {
+      "index": 4,
+      "passed": true,
+      "verified": true,
+      "failure_type": "success",
+      "steps": 3,
+      "elapsed_s": 29.26,
+      "final_result": "Example Domain"
+    },
+    {
+      "index": 5,
+      "passed": false,
+      "verified": false,
+      "failure_type": "verification_mismatch",
+      "steps": 3,
+      "elapsed_s": 25.63,
+      "final_result": "https://example.com"
+    },
+    {
+      "index": 6,
+      "passed": true,
+      "verified": true,
+      "failure_type": "success",
+      "steps": 3,
+      "elapsed_s": 26.85,
+      "final_result": "Example Domain"
+    },
+    {
+      "index": 7,
+      "passed": false,
+      "verified": false,
+      "failure_type": "verification_mismatch",
+      "steps": 3,
+      "elapsed_s": 31.38,
+      "final_result": "https://example.com"
+    },
+    {
+      "index": 8,
+      "passed": true,
+      "verified": true,
+      "failure_type": "success",
+      "steps": 3,
+      "elapsed_s": 27.64,
+      "final_result": "Page title: 'Example Domain', URL: https://example.com"
+    },
+    {
+      "index": 9,
+      "passed": true,
+      "verified": true,
+      "failure_type": "success",
+      "steps": 2,
+      "elapsed_s": 12.4,
+      "final_result": "Example Domain"
+    },
+    {
+      "index": 10,
+      "passed": true,
+      "verified": true,
+      "failure_type": "success",
+      "steps": 3,
+      "elapsed_s": 21.52,
+      "final_result": "<title>Example Domain</title><url>https://example.com</url>"
+    }
+  ]
+}

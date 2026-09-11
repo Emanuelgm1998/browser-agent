@@ -1,0 +1,89 @@
+{
+  "model": "qwen3:1.7b",
+  "runs": 10,
+  "done": 8,
+  "passed": 7,
+  "success_rate": 70.0,
+  "results": [
+    {
+      "index": 1,
+      "passed": true,
+      "done": true,
+      "steps": 11,
+      "elapsed_s": 151.4,
+      "final_result": "Example Domain, https://example.com"
+    },
+    {
+      "index": 2,
+      "passed": false,
+      "done": true,
+      "steps": 11,
+      "elapsed_s": 160.83,
+      "final_result": "https://example.com"
+    },
+    {
+      "index": 3,
+      "passed": true,
+      "done": true,
+      "steps": 11,
+      "elapsed_s": 147.92,
+      "final_result": "Example Domain"
+    },
+    {
+      "index": 4,
+      "passed": true,
+      "done": true,
+      "steps": 11,
+      "elapsed_s": 139.27,
+      "final_result": "Example Domain"
+    },
+    {
+      "index": 5,
+      "passed": true,
+      "done": true,
+      "steps": 11,
+      "elapsed_s": 169.62,
+      "final_result": "Example Domain"
+    },
+    {
+      "index": 6,
+      "passed": true,
+      "done": true,
+      "steps": 11,
+      "elapsed_s": 173.33,
+      "final_result": "Example Domain"
+    },
+    {
+      "index": 7,
+      "passed": false,
+      "done": false,
+      "steps": 11,
+      "elapsed_s": 127.38,
+      "final_result": ""
+    },
+    {
+      "index": 8,
+      "passed": false,
+      "done": false,
+      "steps": 4,
+      "elapsed_s": 35.86,
+      "final_result": ""
+    },
+    {
+      "index": 9,
+      "passed": true,
+      "done": true,
+      "steps": 11,
+      "elapsed_s": 160.08,
+      "final_result": "Example Domain"
+    },
+    {
+      "index": 10,
+      "passed": true,
+      "done": true,
+      "steps": 11,
+      "elapsed_s": 149.83,
+      "final_result": "Example Domain"
+    }
+  ]
+}

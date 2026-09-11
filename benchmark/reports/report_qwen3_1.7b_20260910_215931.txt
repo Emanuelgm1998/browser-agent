@@ -1,0 +1,88 @@
+==============================================================
+BROWSER AGENT EVAL v0.2
+==============================================================
+MODEL: qwen3:1.7b
+Generated: 2026-09-10T21:59:32
+Total runs: 50
+
+
+Tier 1
+----------------------------------------
+  T1 Open URL + exact title (Tier 1)
+    runs=5 success=4/5 (80.0%) done=5/5 (100.0%) verified=4/5 (80.0%)
+    avg_steps=3.0 avg_time=24.85s avg_retries=0.0 recovery_rate=0.0% clean_runs=4/5
+    failures={"extraction_failure": 1, "success": 4}
+  T2 Exact text extraction (Tier 1)
+    runs=5 success=0/5 (0.0%) done=5/5 (100.0%) verified=0/5 (0.0%)
+    avg_steps=3.0 avg_time=38.26s avg_retries=0.0 recovery_rate=0.0% clean_runs=0/5
+    failures={"navigation_failure": 5}
+  T3 Find information on page (Tier 1)
+    runs=5 success=0/5 (0.0%) done=5/5 (100.0%) verified=0/5 (0.0%)
+    avg_steps=3.0 avg_time=33.05s avg_retries=0.0 recovery_rate=0.0% clean_runs=0/5
+    failures={"navigation_failure": 5}
+  Tier 1 totals: success=4/15 (26.7%) done=15/15 verified=4/15 avg_time=32.05s avg_steps=3.0 avg_retries=0.0 recovery_rate=0.0%
+  Tier 1 failures={"extraction_failure": 1, "navigation_failure": 10, "success": 4}
+
+Tier 2
+----------------------------------------
+  T4 Click + destination verification (Tier 2)
+    runs=5 success=0/5 (0.0%) done=5/5 (100.0%) verified=0/5 (0.0%)
+    avg_steps=6.8 avg_time=112.27s avg_retries=0.0 recovery_rate=0.0% clean_runs=0/5
+    failures={"interaction_failure": 1, "navigation_failure": 4}
+  T5 Multi-step navigation (Tier 2)
+    runs=5 success=0/5 (0.0%) done=5/5 (100.0%) verified=0/5 (0.0%)
+    avg_steps=8.4 avg_time=168.37s avg_retries=0.0 recovery_rate=0.0% clean_runs=0/5
+    failures={"interaction_failure": 4, "navigation_failure": 1}
+  T6 Form interaction (Tier 2)
+    runs=5 success=0/5 (0.0%) done=5/5 (100.0%) verified=0/5 (0.0%)
+    avg_steps=3.0 avg_time=30.51s avg_retries=0.0 recovery_rate=0.0% clean_runs=0/5
+    failures={"interaction_failure": 5}
+  Tier 2 totals: success=0/15 (0.0%) done=15/15 verified=0/15 avg_time=103.72s avg_steps=6.07 avg_retries=0.0 recovery_rate=0.0%
+  Tier 2 failures={"interaction_failure": 10, "navigation_failure": 5}
+
+Tier 3
+----------------------------------------
+  T10 Multi-step web research (Tier 3)
+    runs=5 success=0/5 (0.0%) done=5/5 (100.0%) verified=0/5 (0.0%)
+    avg_steps=3.0 avg_time=35.29s avg_retries=0.0 recovery_rate=0.0% clean_runs=0/5
+    synthesis_rate=0.0% (medida por separado)
+    failures={"navigation_failure": 5}
+  T7 Search + result extraction (Tier 3)
+    runs=5 success=0/5 (0.0%) done=5/5 (100.0%) verified=0/5 (0.0%)
+    avg_steps=3.0 avg_time=33.1s avg_retries=0.0 recovery_rate=0.0% clean_runs=0/5
+    failures={"interaction_failure": 5}
+  T8 Structured research (Tier 3)
+    runs=5 success=0/5 (0.0%) done=5/5 (100.0%) verified=0/5 (0.0%)
+    avg_steps=4.6 avg_time=57.25s avg_retries=0.0 recovery_rate=0.0% clean_runs=0/5
+    failures={"navigation_failure": 5}
+  T9 Comparison task (Tier 3)
+    runs=5 success=0/5 (0.0%) done=5/5 (100.0%) verified=0/5 (0.0%)
+    avg_steps=6.0 avg_time=193.92s avg_retries=0.2 recovery_rate=20.0% clean_runs=0/5
+    synthesis_rate=0.0% (medida por separado)
+    failures={"navigation_failure": 5}
+  Tier 3 totals: success=0/20 (0.0%) done=20/20 verified=0/20 avg_time=79.89s avg_steps=4.15 avg_retries=0.05 recovery_rate=5.0%
+  Tier 3 failures={"interaction_failure": 5, "navigation_failure": 15}
+
+
+OVERALL
+----------------------------------------
+success 4/50 (8.0%)  done 50/50 (100.0%)  verified 4/50 (8.0%)
+avg_steps=4.38 avg_time=72.69s avg_retries=0.02
+
+FAILURE DISTRIBUTION
+----------------------------------------
+  extraction_failure: 1
+  interaction_failure: 15
+  navigation_failure: 30
+  success: 4
+
+RECOVERY
+----------------------------------------
+runs_with_recovery=1/50 (2.0%)
+avg_retries=0.02 avg_recovery_events=0.02 total_retry_delay=1.0s
+recovery_success=0 recovery_failed=1
+nav_redundant_blocks_total=96 (navegaciones repetidas cortadas por el dedupe guard)
+
+MODEL CAPABILITY SEPARATION (evidence, not judgement)
+----------------------------------------
+navigation vs model attribution: see failure categories above

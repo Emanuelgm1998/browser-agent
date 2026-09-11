@@ -1,0 +1,47 @@
+==============================================================
+BROWSER AGENT EVAL v0.2
+==============================================================
+MODEL: qwen3:1.7b
+Generated: 2026-09-10T20:58:12
+Total runs: 2
+
+
+Tier 1
+----------------------------------------
+  T1 Open URL + exact title (Tier 1)
+    runs=1 success=1/1 (100.0%) done=1/1 (100.0%) verified=1/1 (100.0%)
+    avg_steps=3.0 avg_time=21.75s avg_retries=0.0 recovery_rate=0.0% clean_runs=1/1
+    failures={"success": 1}
+  Tier 1 totals: success=1/1 (100.0%) done=1/1 verified=1/1 avg_time=21.75s avg_steps=3.0 avg_retries=0.0 recovery_rate=0.0%
+  Tier 1 failures={"success": 1}
+
+Tier 2
+----------------------------------------
+  T4 Click + destination verification (Tier 2)
+    runs=1 success=0/1 (0.0%) done=1/1 (100.0%) verified=0/1 (0.0%)
+    avg_steps=3.0 avg_time=29.25s avg_retries=0.0 recovery_rate=0.0% clean_runs=0/1
+    failures={"interaction_failure": 1}
+  Tier 2 totals: success=0/1 (0.0%) done=1/1 verified=0/1 avg_time=29.25s avg_steps=3.0 avg_retries=0.0 recovery_rate=0.0%
+  Tier 2 failures={"interaction_failure": 1}
+
+
+OVERALL
+----------------------------------------
+success 1/2 (50.0%)  done 2/2 (100.0%)  verified 1/2 (50.0%)
+avg_steps=3.0 avg_time=25.5s avg_retries=0.0
+
+FAILURE DISTRIBUTION
+----------------------------------------
+  interaction_failure: 1
+  success: 1
+
+RECOVERY
+----------------------------------------
+runs_with_recovery=0/2 (0.0%)
+avg_retries=0.0 avg_recovery_events=0.0 total_retry_delay=0.0s
+recovery_success=0 recovery_failed=0
+nav_redundant_blocks_total=2 (navegaciones repetidas cortadas por el dedupe guard)
+
+MODEL CAPABILITY SEPARATION (evidence, not judgement)
+----------------------------------------
+navigation vs model attribution: see failure categories above

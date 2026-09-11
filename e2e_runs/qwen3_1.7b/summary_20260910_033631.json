@@ -1,0 +1,22 @@
+{
+  "model": "qwen3:1.7b",
+  "runs": 1,
+  "done": 0,
+  "verified": 0,
+  "passed": 0,
+  "success_rate": 0.0,
+  "failure_breakdown": {
+    "run_error": 1
+  },
+  "results": [
+    {
+      "index": 1,
+      "passed": false,
+      "verified": false,
+      "failure_type": "run_error",
+      "steps": 9,
+      "elapsed_s": 86.01,
+      "final_result": ""
+    }
+  ]
+}

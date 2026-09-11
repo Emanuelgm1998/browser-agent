@@ -1,0 +1,242 @@
+{
+  "run_id": "qwen3_1.7b_T9_05_20260911_032601",
+  "benchmark_version": "0.2",
+  "task_id": "T9",
+  "tier": 3,
+  "task_name": "Comparison task",
+  "model": "qwen3:1.7b",
+  "model_family": "qwen3",
+  "experiment_condition": "B",
+  "include_attributes": [
+    "title",
+    "type",
+    "checked",
+    "id",
+    "name",
+    "role",
+    "value",
+    "placeholder",
+    "data-date-format",
+    "alt",
+    "aria-label",
+    "aria-expanded",
+    "data-state",
+    "aria-checked",
+    "aria-valuemin",
+    "aria-valuemax",
+    "aria-valuenow",
+    "aria-placeholder",
+    "pattern",
+    "min",
+    "max",
+    "minlength",
+    "maxlength",
+    "step",
+    "accept",
+    "multiple",
+    "inputmode",
+    "autocomplete",
+    "aria-autocomplete",
+    "list",
+    "data-mask",
+    "data-inputmask",
+    "data-datepicker",
+    "format",
+    "expected_format",
+    "contenteditable",
+    "pseudo",
+    "checked",
+    "selected",
+    "expanded",
+    "pressed",
+    "disabled",
+    "invalid",
+    "valuemin",
+    "valuemax",
+    "valuenow",
+    "keyshortcuts",
+    "haspopup",
+    "multiselectable",
+    "required",
+    "valuetext",
+    "level",
+    "busy",
+    "live",
+    "ax_name",
+    "href"
+  ],
+  "timestamp": "2026-09-11T03:26:01",
+  "done": true,
+  "success": false,
+  "verified": false,
+  "verified_all": false,
+  "destination_ok": false,
+  "data_ok": false,
+  "synthesis_ok": false,
+  "failure_category": "navigation_failure",
+  "steps": 3,
+  "max_steps": 18,
+  "time_seconds": 25.35,
+  "timeout": false,
+  "attempts": 1,
+  "retries": 0,
+  "recovery_events": 0,
+  "retry_delay_total": 0,
+  "navigation_retries": 1,
+  "recovery_success": false,
+  "recovery_failed": false,
+  "navigation_count": 2,
+  "final_url": "http://127.0.0.1:61405/compare_index.html",
+  "observed_title": "Comparison Index",
+  "final_result": "Comparison Index",
+  "errors": [],
+  "trace_actions": {
+    "navigate": 2,
+    "done": 1
+  },
+  "visited_urls": [
+    "http://127.0.0.1:61405/compare_index.html",
+    "http://127.0.0.1:61405/compare_index.html",
+    "http://127.0.0.1:61405/compare_index.html"
+  ],
+  "verification_details": {
+    "destination": [
+      {
+        "ok": false,
+        "expected": [
+          "compare_a.html",
+          "compare_b.html"
+        ],
+        "actual": [
+          "/compare_index.html",
+          "/compare_index.html",
+          "/compare_index.html"
+        ],
+        "note": "missing=['compare_a.html', 'compare_b.html']",
+        "check": {
+          "type": "multi_url_reached",
+          "urls": [
+            "compare_a.html",
+            "compare_b.html"
+          ]
+        }
+      }
+    ],
+    "data": [
+      {
+        "ok": false,
+        "expected": [
+          "$99"
+        ],
+        "actual": {
+          "final": "Comparison Index",
+          "dom_found": null
+        },
+        "note": "missing=$99",
+        "check": {
+          "type": "text_contains",
+          "expected": "$99",
+          "where": "final"
+        }
+      },
+      {
+        "ok": false,
+        "expected": [
+          "$79"
+        ],
+        "actual": {
+          "final": "Comparison Index",
+          "dom_found": null
+        },
+        "note": "missing=$79",
+        "check": {
+          "type": "text_contains",
+          "expected": "$79",
+          "where": "final"
+        }
+      },
+      {
+        "ok": false,
+        "expected": [
+          "2000"
+        ],
+        "actual": {
+          "final": "Comparison Index",
+          "dom_found": null
+        },
+        "note": "missing=2000",
+        "check": {
+          "type": "text_contains",
+          "expected": "2000",
+          "where": "final"
+        }
+      },
+      {
+        "ok": false,
+        "expected": [
+          "2200"
+        ],
+        "actual": {
+          "final": "Comparison Index",
+          "dom_found": null
+        },
+        "note": "missing=2200",
+        "check": {
+          "type": "text_contains",
+          "expected": "2200",
+          "where": "final"
+        }
+      },
+      {
+        "ok": false,
+        "expected": [
+          "$99",
+          "$79"
+        ],
+        "actual": "compare two products alphaglow betashine",
+        "check": {
+          "type": "source_data_match",
+          "expected": [
+            "$99",
+            "$79"
+          ]
+        }
+      }
+    ],
+    "synthesis": [
+      {
+        "ok": false,
+        "expected": [
+          "BetaShine"
+        ],
+        "actual": {
+          "final": "Comparison Index",
+          "dom_found": null
+        },
+        "note": "missing=BetaShine",
+        "check": {
+          "type": "text_contains",
+          "expected": "BetaShine",
+          "where": "final"
+        }
+      },
+      {
+        "ok": false,
+        "expected": [
+          "$79"
+        ],
+        "actual": {
+          "final": "Comparison Index",
+          "dom_found": null
+        },
+        "note": "missing=$79",
+        "check": {
+          "type": "text_contains",
+          "expected": "$79",
+          "where": "final"
+        }
+      }
+    ]
+  },
+  "done_false_positive": false
+}

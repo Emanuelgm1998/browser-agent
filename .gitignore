@@ -1,11 +1,6 @@
-.venv/
+﻿.venv/
 __pycache__/
 *.pyc
-runs/
-e2e_runs/
-browser_profile/
-*.png
-*.gif
-ollama_raw_logs/
-benchmark/runs/
-benchmark/reports/
+.env
+*.log
+.vscode/

@@ -1,0 +1,40 @@
+{
+  "model": "qwen3:1.7b",
+  "runs": 3,
+  "done": 3,
+  "verified": 0,
+  "passed": 0,
+  "success_rate": 0.0,
+  "failure_breakdown": {
+    "verification_mismatch": 3
+  },
+  "results": [
+    {
+      "index": 1,
+      "passed": false,
+      "verified": false,
+      "failure_type": "verification_mismatch",
+      "steps": 3,
+      "elapsed_s": 143.67,
+      "final_result": "https://www.python.org"
+    },
+    {
+      "index": 2,
+      "passed": false,
+      "verified": false,
+      "failure_type": "verification_mismatch",
+      "steps": 3,
+      "elapsed_s": 151.48,
+      "final_result": "The page title is 'Python' and the URL is 'https://www.python.org'."
+    },
+    {
+      "index": 3,
+      "passed": false,
+      "verified": false,
+      "failure_type": "verification_mismatch",
+      "steps": 3,
+      "elapsed_s": 135.27,
+      "final_result": "https://www.python.org"
+    }
+  ]
+}

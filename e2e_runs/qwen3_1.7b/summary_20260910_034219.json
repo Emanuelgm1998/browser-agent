@@ -1,0 +1,41 @@
+{
+  "model": "qwen3:1.7b",
+  "runs": 3,
+  "done": 2,
+  "verified": 0,
+  "passed": 0,
+  "success_rate": 0.0,
+  "failure_breakdown": {
+    "navigation_watchdog": 1,
+    "verification_mismatch": 2
+  },
+  "results": [
+    {
+      "index": 1,
+      "passed": false,
+      "verified": false,
+      "failure_type": "navigation_watchdog",
+      "steps": 3,
+      "elapsed_s": 69.35,
+      "final_result": ""
+    },
+    {
+      "index": 2,
+      "passed": false,
+      "verified": false,
+      "failure_type": "verification_mismatch",
+      "steps": 4,
+      "elapsed_s": 67.87,
+      "final_result": "Example Domain"
+    },
+    {
+      "index": 3,
+      "passed": false,
+      "verified": false,
+      "failure_type": "verification_mismatch",
+      "steps": 6,
+      "elapsed_s": 84.98,
+      "final_result": "Example Domain"
+    }
+  ]
+}

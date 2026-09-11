@@ -1,0 +1,189 @@
+{
+  "run_id": "qwen3_1.7b_T9_10_20260911_030843",
+  "benchmark_version": "0.2",
+  "task_id": "T9",
+  "tier": 3,
+  "task_name": "Comparison task",
+  "model": "qwen3:1.7b",
+  "model_family": "qwen3",
+  "experiment_condition": "A",
+  "include_attributes": null,
+  "timestamp": "2026-09-11T03:08:43",
+  "done": true,
+  "success": false,
+  "verified": false,
+  "verified_all": false,
+  "destination_ok": false,
+  "data_ok": false,
+  "synthesis_ok": false,
+  "failure_category": "navigation_failure",
+  "steps": 4,
+  "max_steps": 18,
+  "time_seconds": 49.14,
+  "timeout": false,
+  "attempts": 1,
+  "retries": 0,
+  "recovery_events": 0,
+  "retry_delay_total": 0,
+  "navigation_retries": 2,
+  "recovery_success": false,
+  "recovery_failed": false,
+  "navigation_count": 3,
+  "final_url": "http://127.0.0.1:53568/compare_index.html",
+  "observed_title": "Comparison Index",
+  "final_result": "Comparison Index",
+  "errors": [
+    "BLOCKED: you already navigated to http://127.0.0.1:53568/compare_index.html and it is already loaded. Re-navigating is a CRITICAL ERROR. Do NOT call navigate again. The required title and URL are already in your memory: call done now with the observed values."
+  ],
+  "trace_actions": {
+    "navigate": 3,
+    "done": 1
+  },
+  "visited_urls": [
+    "http://127.0.0.1:53568/compare_index.html",
+    "http://127.0.0.1:53568/compare_index.html",
+    "http://127.0.0.1:53568/compare_index.html",
+    "http://127.0.0.1:53568/compare_index.html"
+  ],
+  "verification_details": {
+    "destination": [
+      {
+        "ok": false,
+        "expected": [
+          "compare_a.html",
+          "compare_b.html"
+        ],
+        "actual": [
+          "/compare_index.html",
+          "/compare_index.html",
+          "/compare_index.html",
+          "/compare_index.html"
+        ],
+        "note": "missing=['compare_a.html', 'compare_b.html']",
+        "check": {
+          "type": "multi_url_reached",
+          "urls": [
+            "compare_a.html",
+            "compare_b.html"
+          ]
+        }
+      }
+    ],
+    "data": [
+      {
+        "ok": false,
+        "expected": [
+          "$99"
+        ],
+        "actual": {
+          "final": "Comparison Index",
+          "dom_found": null
+        },
+        "note": "missing=$99",
+        "check": {
+          "type": "text_contains",
+          "expected": "$99",
+          "where": "final"
+        }
+      },
+      {
+        "ok": false,
+        "expected": [
+          "$79"
+        ],
+        "actual": {
+          "final": "Comparison Index",
+          "dom_found": null
+        },
+        "note": "missing=$79",
+        "check": {
+          "type": "text_contains",
+          "expected": "$79",
+          "where": "final"
+        }
+      },
+      {
+        "ok": false,
+        "expected": [
+          "2000"
+        ],
+        "actual": {
+          "final": "Comparison Index",
+          "dom_found": null
+        },
+        "note": "missing=2000",
+        "check": {
+          "type": "text_contains",
+          "expected": "2000",
+          "where": "final"
+        }
+      },
+      {
+        "ok": false,
+        "expected": [
+          "2200"
+        ],
+        "actual": {
+          "final": "Comparison Index",
+          "dom_found": null
+        },
+        "note": "missing=2200",
+        "check": {
+          "type": "text_contains",
+          "expected": "2200",
+          "where": "final"
+        }
+      },
+      {
+        "ok": false,
+        "expected": [
+          "$99",
+          "$79"
+        ],
+        "actual": "compare two products alphaglow betashine",
+        "check": {
+          "type": "source_data_match",
+          "expected": [
+            "$99",
+            "$79"
+          ]
+        }
+      }
+    ],
+    "synthesis": [
+      {
+        "ok": false,
+        "expected": [
+          "BetaShine"
+        ],
+        "actual": {
+          "final": "Comparison Index",
+          "dom_found": null
+        },
+        "note": "missing=BetaShine",
+        "check": {
+          "type": "text_contains",
+          "expected": "BetaShine",
+          "where": "final"
+        }
+      },
+      {
+        "ok": false,
+        "expected": [
+          "$79"
+        ],
+        "actual": {
+          "final": "Comparison Index",
+          "dom_found": null
+        },
+        "note": "missing=$79",
+        "check": {
+          "type": "text_contains",
+          "expected": "$79",
+          "where": "final"
+        }
+      }
+    ]
+  },
+  "done_false_positive": false
+}

@@ -1,0 +1,37 @@
+{
+  "created_at": "2026-09-08 22:54:00",
+  "task": "abre https://www.wikipedia.org, busca Chile y dime el título de la página de Chile",
+  "result": "Página de Chile no encontrada",
+  "steps": [
+    {
+      "timestamp": "2026-09-08 22:52:45",
+      "step": 1,
+      "action": {
+        "action": "navigate",
+        "url": "https://www.wikipedia.org"
+      },
+      "result": "Navegación completada. URL=https://www.wikipedia.org/; Título=Wikipedia",
+      "url": "https://www.wikipedia.org/"
+    },
+    {
+      "timestamp": "2026-09-08 22:53:08",
+      "step": 2,
+      "action": {
+        "action": "extract",
+        "selector": "body"
+      },
+      "result": "Wikipedia\nLa enciclopedia libre\nEspañol\n2.136.000+ artículos\nEnglish\n7,237,000+ articles\n日本語\n1,517,000+ 記事\nDeutsch\n3.150.000+ Artikel\nFrançais\n2 778 000+ articles\nРусский\n2 117 000+ статей\nItaliano\n1.985.000+ voci\n中文\n1,554,000+ 条目 / 條目\nPolski\n1 707 000+ haseł\nPortuguês\n1.181.000+ artigos\nSearch Wikipedia\nES\nAfrikaans\nShqip\nالعربية\nAsturianu\nAzərbaycanca\nБългарски\n閩南語 / Bân-lâm-gú\nবাংলা\nБеларуская\nCatalà\nČeština\nCymraeg\nDansk\nDeutsch\nEesti\nΕλληνικά\nEnglish\nEspañol\nEsperanto\nEuskara\nفارسی\nFrançais\nGalego\n한국어\nHausa\nՀայերեն\nहिन्दी\nHrvatski\nBahasa Indonesia\nItaliano\nעברית\nქართული\nLadin\nLatina\nLatviešu\nLietuvių\nMagyar\nМакедонски\nMalagasy\nमराठी\nمصرى\nBahasa Melayu\nBahaso Minangkabau\nမြန်မာဘာသာ\nNederlands\n日本語\nNorsk (bokmål)\nNorsk (nynorsk)\nНохчийн\nOʻzbekcha / Ўзбекча\nPolski\nPortuguês\nҚазақша / Qazaqşa / قازاقشا\nRomână\nSimple English\nSinugboanong Binisaya\nSlovenčina\nSlovenščina\nСрпски / Srpski\nSrpskohrvatski / Српскохрватски\nSuomi\nSvenska\nKiswahili\nதமிழ்\nТатарча / Tatarça\nతెలుగు\nภาษาไทย\nТоҷикӣ\nتۆرکجه\nTürkçe\nУкраїнська\nاردو\nTiếng Việt\nWinaray\n中文\nРусский\n粵語\n Search\n Leer Wikipedia en tu idioma \nWikipedia es alojada por la Fundación Wikimedia, una organización sin fines de lucro que también alberga una gama de otros proyectos.\nPuedes apoyar nuestro trabajo con una donación.\nDescargar Wikipedia para Android o iOS\n\nGuarda tus artículos favoritos para leerlos sin conexión, sincroniza tus listas de lectura en varios dispositivos y personaliza tu experiencia de lectura con la aplicación oficial de Wikipedia.\n\nGoogle Play Store Tienda de aplicaciones de Apple\n \nCommons\nColección multimedia libre\n \nWikiviajes\nLa guía de viajes libre\n \nWikcionario\nEl diccionario libre\n \nWikilibros\nLibros de contenido libre\n \nWikidata\nBase de conocimiento libre\n \nWikiversidad\nPlataforma educativa libre\n \nWikiquote\nLa colección de citas\n \nMediaWiki\nSoftware wiki libre y abierto\n \nWikisource\nBiblioteca de contenido libre\n \nWikispecies\nDirectorio de especies libre\n \nWikifunctions\nFree function library\n \nMeta-Wiki\nCoordinación y documentación comunitaria\n\nEsta página está disponible bajo la licencia Creative Commons Atribución-CompartirIgual Términos de uso Normativa de privacidad",
+      "url": "https://www.wikipedia.org/"
+    },
+    {
+      "timestamp": "2026-09-08 22:53:31",
+      "step": 3,
+      "action": {
+        "action": "extract",
+        "selector": "body"
+      },
+      "result": "Wikipedia\nLa enciclopedia libre\nEspañol\n2.136.000+ artículos\nEnglish\n7,237,000+ articles\n日本語\n1,517,000+ 記事\nDeutsch\n3.150.000+ Artikel\nFrançais\n2 778 000+ articles\nРусский\n2 117 000+ статей\nItaliano\n1.985.000+ voci\n中文\n1,554,000+ 条目 / 條目\nPolski\n1 707 000+ haseł\nPortuguês\n1.181.000+ artigos\nSearch Wikipedia\nES\nAfrikaans\nShqip\nالعربية\nAsturianu\nAzərbaycanca\nБългарски\n閩南語 / Bân-lâm-gú\nবাংলা\nБеларуская\nCatalà\nČeština\nCymraeg\nDansk\nDeutsch\nEesti\nΕλληνικά\nEnglish\nEspañol\nEsperanto\nEuskara\nفارسی\nFrançais\nGalego\n한국어\nHausa\nՀայերեն\nहिन्दी\nHrvatski\nBahasa Indonesia\nItaliano\nעברית\nქართული\nLadin\nLatina\nLatviešu\nLietuvių\nMagyar\nМакедонски\nMalagasy\nमराठी\nمصرى\nBahasa Melayu\nBahaso Minangkabau\nမြန်မာဘာသာ\nNederlands\n日本語\nNorsk (bokmål)\nNorsk (nynorsk)\nНохчийн\nOʻzbekcha / Ўзбекча\nPolski\nPortuguês\nҚазақша / Qazaqşa / قازاقشا\nRomână\nSimple English\nSinugboanong Binisaya\nSlovenčina\nSlovenščina\nСрпски / Srpski\nSrpskohrvatski / Српскохрватски\nSuomi\nSvenska\nKiswahili\nதமிழ்\nТатарча / Tatarça\nతెలుగు\nภาษาไทย\nТоҷикӣ\nتۆرکجه\nTürkçe\nУкраїнська\nاردو\nTiếng Việt\nWinaray\n中文\nРусский\n粵語\n Search\n Leer Wikipedia en tu idioma \nWikipedia es alojada por la Fundación Wikimedia, una organización sin fines de lucro que también alberga una gama de otros proyectos.\nPuedes apoyar nuestro trabajo con una donación.\nDescargar Wikipedia para Android o iOS\n\nGuarda tus artículos favoritos para leerlos sin conexión, sincroniza tus listas de lectura en varios dispositivos y personaliza tu experiencia de lectura con la aplicación oficial de Wikipedia.\n\nGoogle Play Store Tienda de aplicaciones de Apple\n \nCommons\nColección multimedia libre\n \nWikiviajes\nLa guía de viajes libre\n \nWikcionario\nEl diccionario libre\n \nWikilibros\nLibros de contenido libre\n \nWikidata\nBase de conocimiento libre\n \nWikiversidad\nPlataforma educativa libre\n \nWikiquote\nLa colección de citas\n \nMediaWiki\nSoftware wiki libre y abierto\n \nWikisource\nBiblioteca de contenido libre\n \nWikispecies\nDirectorio de especies libre\n \nWikifunctions\nFree function library\n \nMeta-Wiki\nCoordinación y documentación comunitaria\n\nEsta página está disponible bajo la licencia Creative Commons Atribución-CompartirIgual Términos de uso Normativa de privacidad",
+      "url": "https://www.wikipedia.org/"
+    }
+  ]
+}

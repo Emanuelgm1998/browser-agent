@@ -1,0 +1,56 @@
+==============================================================
+BROWSER AGENT EVAL v0.2
+==============================================================
+MODEL: qwen3:1.7b
+Generated: 2026-09-10T22:03:30
+Total runs: 4
+
+
+Tier 1
+----------------------------------------
+  T2 Exact text extraction (Tier 1)
+    runs=1 success=0/1 (0.0%) done=1/1 (100.0%) verified=0/1 (0.0%)
+    avg_steps=3.0 avg_time=27.78s avg_retries=0.0 recovery_rate=0.0% clean_runs=0/1
+    failures={"extraction_failure": 1}
+  T3 Find information on page (Tier 1)
+    runs=1 success=0/1 (0.0%) done=1/1 (100.0%) verified=0/1 (0.0%)
+    avg_steps=3.0 avg_time=35.89s avg_retries=0.0 recovery_rate=0.0% clean_runs=0/1
+    failures={"extraction_failure": 1}
+  Tier 1 totals: success=0/2 (0.0%) done=2/2 verified=0/2 avg_time=31.84s avg_steps=3.0 avg_retries=0.0 recovery_rate=0.0%
+  Tier 1 failures={"extraction_failure": 2}
+
+Tier 3
+----------------------------------------
+  T7 Search + result extraction (Tier 3)
+    runs=1 success=0/1 (0.0%) done=1/1 (100.0%) verified=0/1 (0.0%)
+    avg_steps=3.0 avg_time=51.94s avg_retries=0.0 recovery_rate=0.0% clean_runs=0/1
+    failures={"interaction_failure": 1}
+  T8 Structured research (Tier 3)
+    runs=1 success=0/1 (0.0%) done=1/1 (100.0%) verified=0/1 (0.0%)
+    avg_steps=3.0 avg_time=36.86s avg_retries=0.0 recovery_rate=0.0% clean_runs=0/1
+    failures={"navigation_failure": 1}
+  Tier 3 totals: success=0/2 (0.0%) done=2/2 verified=0/2 avg_time=44.4s avg_steps=3.0 avg_retries=0.0 recovery_rate=0.0%
+  Tier 3 failures={"interaction_failure": 1, "navigation_failure": 1}
+
+
+OVERALL
+----------------------------------------
+success 0/4 (0.0%)  done 4/4 (100.0%)  verified 0/4 (0.0%)
+avg_steps=3.0 avg_time=38.12s avg_retries=0.0
+
+FAILURE DISTRIBUTION
+----------------------------------------
+  extraction_failure: 2
+  interaction_failure: 1
+  navigation_failure: 1
+
+RECOVERY
+----------------------------------------
+runs_with_recovery=0/4 (0.0%)
+avg_retries=0.0 avg_recovery_events=0.0 total_retry_delay=0.0s
+recovery_success=0 recovery_failed=0
+nav_redundant_blocks_total=4 (navegaciones repetidas cortadas por el dedupe guard)
+
+MODEL CAPABILITY SEPARATION (evidence, not judgement)
+----------------------------------------
+navigation vs model attribution: see failure categories above

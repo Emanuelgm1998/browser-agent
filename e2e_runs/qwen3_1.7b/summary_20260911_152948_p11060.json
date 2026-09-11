@@ -1,0 +1,22 @@
+{
+  "model": "qwen3:1.7b",
+  "runs": 1,
+  "done": 1,
+  "verified": 1,
+  "passed": 1,
+  "success_rate": 100.0,
+  "failure_breakdown": {
+    "success": 1
+  },
+  "results": [
+    {
+      "index": 1,
+      "passed": true,
+      "verified": true,
+      "failure_type": "success",
+      "steps": 3,
+      "elapsed_s": 101.64,
+      "final_result": "<title>Example Domain</title><meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" /><meta name=\"generator\" content=\"Example Domain\" /><meta name=\"description\" content=\"This domain is for use in documentation examples without needing permission. Avoid use in operations.\" /><meta name=\"viewport\" content=\"width=device-width\" /><link rel=\"icon\" href=\"https://example.com/favicon.ico\" /><style>body { font-family: sans-serif; background-color: #f0f0f0; } h1 { color: #333; } a { color: #007acc; text-decoration: none; } a:hover { text-decoration: underline; } </style><div style=\"margin: 20px; padding: 10px; background-color: #fff; border: 1px solid #ccc;\"><h1>Example Domain</h1><p>This domain is for use in documentation examples without needing permission. Avoid use in operations.</p><p><a href=\"https://example.com/\">Learn more</a></div>"
+    }
+  ]
+}

@@ -1,0 +1,148 @@
+{
+  "model": "qwen3:1.7b",
+  "runs": 15,
+  "done": 15,
+  "verified": 15,
+  "passed": 15,
+  "success_rate": 100.0,
+  "failure_breakdown": {
+    "success": 15
+  },
+  "results": [
+    {
+      "index": 1,
+      "passed": true,
+      "verified": true,
+      "failure_type": "success",
+      "steps": 3,
+      "elapsed_s": 31.54,
+      "final_result": "Example Domain"
+    },
+    {
+      "index": 2,
+      "passed": true,
+      "verified": true,
+      "failure_type": "success",
+      "steps": 3,
+      "elapsed_s": 29.52,
+      "final_result": "<title>Example Domain</title><meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" /><meta name=\"generator\" content=\"Example Domain\" /><meta name=\"description\" content=\"This domain is for use in documentation examples without needing permission. Avoid use in operations.\" /><meta name=\"viewport\" content=\"width=device-width\" /><link rel=\"icon\" href=\"https://example.com/favicon.ico\" /><body>Example Domain<br><br>This domain is for use in documentation examples without needing permission. Avoid use in operations.<br><br>Learn more</body>"
+    },
+    {
+      "index": 3,
+      "passed": true,
+      "verified": true,
+      "failure_type": "success",
+      "steps": 3,
+      "elapsed_s": 21.61,
+      "final_result": "Example Domain"
+    },
+    {
+      "index": 4,
+      "passed": true,
+      "verified": true,
+      "failure_type": "success",
+      "steps": 3,
+      "elapsed_s": 40.27,
+      "final_result": "<title>Example Domain</title><meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" /><meta name=\"generator\" content=\"Example Domain\" /><meta name=\"description\" content=\"This domain is for use in documentation examples without needing permission. Avoid use in operations.\" /><meta name=\"viewport\" content=\"width=device-width\" /><link rel=\"icon\" href=\"https://example.com/favicon.ico\" /><style>body { background-color: #f0f0f0; color: #333; } h1 { color: #e74c3c; } a { color: #2980b9; text-decoration: none; } a:hover { text-decoration: underline; } </style><div style=\"margin: 20px; padding: 10px; background-color: #fff; border: 1px solid #ccc;\"><h1>Example Domain</h1><p>This domain is for use in documentation examples without needing permission. Avoid use in operations.</p><p><a href=\"https://example.com/\">Learn more</a></p></div>"
+    },
+    {
+      "index": 5,
+      "passed": true,
+      "verified": true,
+      "failure_type": "success",
+      "steps": 3,
+      "elapsed_s": 22.28,
+      "final_result": "Example Domain"
+    },
+    {
+      "index": 6,
+      "passed": true,
+      "verified": true,
+      "failure_type": "success",
+      "steps": 3,
+      "elapsed_s": 41.24,
+      "final_result": "<title>Example Domain</title><meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" /><meta name=\"generator\" content=\"Example Domain\" /><meta name=\"description\" content=\"This domain is for use in documentation examples without needing permission. Avoid use in operations.\" /><meta name=\"viewport\" content=\"width=device-width\" /><link rel=\"icon\" href=\"https://example.com/favicon.ico\" /><style>body { font-family: sans-serif; background-color: #f0f0f0; } h1 { color: #333; } a { color: #007acc; text-decoration: none; } a:hover { text-decoration: underline; } </style><div style=\"margin: 20px; padding: 10px; background-color: #fff; border: 1px solid #ccc;\"><h1>Example Domain</h1><p>This domain is for use in documentation examples without needing permission. Avoid use in operations.</p><p><a href=\"https://example.com/\">Learn more</a></div>"
+    },
+    {
+      "index": 7,
+      "passed": true,
+      "verified": true,
+      "failure_type": "success",
+      "steps": 4,
+      "elapsed_s": 37.93,
+      "final_result": "Example Domain"
+    },
+    {
+      "index": 8,
+      "passed": true,
+      "verified": true,
+      "failure_type": "success",
+      "steps": 3,
+      "elapsed_s": 42.29,
+      "final_result": "<title>Example Domain</title><meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" /><meta name=\"generator\" content=\"Example Domain\" /><meta name=\"description\" content=\"This domain is for use in documentation examples without needing permission. Avoid use in operations.\" /><meta name=\"viewport\" content=\"width=device-width\" /><link rel=\"icon\" href=\"https://example.com/favicon.ico\" /><style>body { font-family: sans-serif; background-color: #f0f0f0; } h1 { color: #333; } a { color: #007acc; text-decoration: none; } a:hover { text-decoration: underline; } </style><div style=\"margin: 20px; padding: 10px; background-color: #fff; border: 1px solid #ccc;\"><h1>Example Domain</h1><p>This domain is for use in documentation examples without needing permission. Avoid use in operations.</p><p><a href=\"https://example.com/\">Learn more</a></div>"
+    },
+    {
+      "index": 9,
+      "passed": true,
+      "verified": true,
+      "failure_type": "success",
+      "steps": 3,
+      "elapsed_s": 24.33,
+      "final_result": "Example Domain"
+    },
+    {
+      "index": 10,
+      "passed": true,
+      "verified": true,
+      "failure_type": "success",
+      "steps": 3,
+      "elapsed_s": 24.13,
+      "final_result": "Example Domain"
+    },
+    {
+      "index": 11,
+      "passed": true,
+      "verified": true,
+      "failure_type": "success",
+      "steps": 3,
+      "elapsed_s": 41.99,
+      "final_result": "<title>Example Domain</title><meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" /><meta name=\"generator\" content=\"Example Domain\" /><meta name=\"description\" content=\"This domain is for use in documentation examples without needing permission. Avoid use in operations.\" /><meta name=\"viewport\" content=\"width=device-width\" /><link rel=\"icon\" href=\"https://example.com/favicon.ico\" /><style>body { font-family: sans-serif; background-color: #f0f0f0; } h1 { color: #333; } a { color: #007acc; text-decoration: none; } a:hover { text-decoration: underline; } </style><div style=\"margin: 20px; padding: 10px; background-color: #fff; border: 1px solid #ccc;\"><h1>Example Domain</h1><p>This domain is for use in documentation examples without needing permission. Avoid use in operations.</p><p><a href=\"https://example.com/\">Learn more</a></div>"
+    },
+    {
+      "index": 12,
+      "passed": true,
+      "verified": true,
+      "failure_type": "success",
+      "steps": 3,
+      "elapsed_s": 32.76,
+      "final_result": "<title>Example Domain</title><meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" /><meta name=\"viewport\" content=\"width=device-width\" /> <link rel=\"icon\" href=\"https://example.com/favicon.ico\" /> <style> body { font-family: Arial, sans-serif; } </style> <h1>Example Domain</h1> <p>This domain is for use in documentation examples without needing permission. Avoid use in operations.</p> <a href=\"https://example.com/learn\">Learn more</a>"
+    },
+    {
+      "index": 13,
+      "passed": true,
+      "verified": true,
+      "failure_type": "success",
+      "steps": 3,
+      "elapsed_s": 24.11,
+      "final_result": "Example Domain"
+    },
+    {
+      "index": 14,
+      "passed": true,
+      "verified": true,
+      "failure_type": "success",
+      "steps": 3,
+      "elapsed_s": 24.45,
+      "final_result": "Example Domain"
+    },
+    {
+      "index": 15,
+      "passed": true,
+      "verified": true,
+      "failure_type": "success",
+      "steps": 3,
+      "elapsed_s": 24.54,
+      "final_result": "Example Domain"
+    }
+  ]
+}
