@@ -305,6 +305,39 @@ class Verifier:
                 except Exception as exc:
                     actual = f"fetch_error: {type(exc).__name__}"
             return {"ok": ok, "expected": expected, "actual": actual}
+        if ctype == "page_data_match":
+            page = check["page"]
+            tokens = check["tokens"]
+            if isinstance(tokens, str):
+                tokens = [tokens]
+            visited_urls = []
+            for v in (record.get("visited_urls") or []):
+                p = path_of(v)
+                if p:
+                    visited_urls.append((v, p))
+            suffix = "/" + page.rstrip("/")
+            reached_candidates = [(u, p) for u, p in visited_urls if p.endswith(suffix)]
+            reached = bool(reached_candidates)
+            match = None
+            note = None
+            if reached:
+                try:
+                    page_text = norm_lower((await self._fetch(reached_candidates[-1][0]))["text"])
+                    match = all(norm_lower(t) in page_text for t in tokens)
+                    if not match:
+                        missing = [t for t in tokens if norm_lower(t) not in page_text]
+                        note = "missing=" + ",".join(missing)
+                except Exception as exc:
+                    match = None
+                    note = f"fetch_error: {type(exc).__name__}"
+            return {
+                "ok": reached and match is True,
+                "reached": reached,
+                "match": match,
+                "expected": tokens,
+                "actual": {"page": page, "visited": reached, "match": match},
+                "note": note,
+            }
         if ctype == "structured_field_match":
             expected = check["expected"]
             parsed = extract_json(record.get("final_result"))
@@ -374,7 +407,19 @@ class Verifier:
             groups[name] = results
         ok = {name: all(r["ok"] for r in results) for name, results in groups.items()}
         ok["synthesis"] = ok["synthesis"] if task.synthesis else None
-        return {"groups": groups, "destination_ok": ok["destination"], "data_ok": ok["data"], "synthesis_ok": ok["synthesis"]}
+        pages = {}
+        for name, results in groups.items():
+            for r in results:
+                c = r.get("check") or {}
+                if c.get("type") == "page_data_match":
+                    pages[c["page"]] = {"reached": r.get("reached"), "match": r.get("match")}
+        return {
+            "groups": groups,
+            "destination_ok": ok["destination"],
+            "data_ok": ok["data"],
+            "synthesis_ok": ok["synthesis"],
+            "pages": pages,
+        }
 
 
 def _find_matching_item(items, expected):

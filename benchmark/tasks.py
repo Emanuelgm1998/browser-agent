@@ -267,15 +267,15 @@ TASKS: list[BenchTask] = [
             {"type": "multi_url_reached", "urls": ["compare_a.html", "compare_b.html"]},
         ],
         data=[
-            text_contains("$99"),
-            text_contains("$79"),
-            text_contains("2000"),
-            text_contains("2200"),
-            source_data_match(["$99", "$79"]),
+            {"type": "page_data_match", "page": "compare_a.html", "tokens": ["$99", "2000"]},
+            {"type": "page_data_match", "page": "compare_b.html", "tokens": ["$79", "2200"]},
         ],
         synthesis=[
             text_contains("BetaShine"),
             text_contains("$79"),
+            text_contains("$99"),
+            text_contains("2000"),
+            text_contains("2200"),
         ],
         required_urls=["compare_a.html", "compare_b.html"],
         success_gates=["destination", "data"],  # synthesis measured separately

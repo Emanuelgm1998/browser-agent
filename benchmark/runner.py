@@ -44,6 +44,47 @@ def resolve_include_attributes(value):
     return [v.strip() for v in str(value).split(",") if v.strip()]
 
 
+_RAW = {"dir": None, "label": None}
+
+
+def install_raw_llm_logger(directory):
+    """Wrap Qwen3ChatOllama.get_client so the RAW Ollama response content
+    (phase B of A->B->C->D) is persisted. Pass-through: no semantic change."""
+    from qwen3_chat_ollama import Qwen3ChatOllama
+
+    original_get_client = Qwen3ChatOllama.get_client
+
+    def logging_get_client(self):
+        client = original_get_client(self)
+        original_chat = client.chat
+
+        async def chat_trace(*args, **kwargs):
+            response = await original_chat(*args, **kwargs)
+            try:
+                raw = getattr(getattr(response, "message", None), "content", None)
+                if _RAW["dir"]:
+                    line = {
+                        "ts": datetime.now().isoformat(timespec="seconds"),
+                        "label": _RAW["label"],
+                        "model": getattr(self, "model", None),
+                        "format_schema": bool(kwargs.get("format")),
+                        "messages_count": len(kwargs.get("messages") or (args[0] if args else []) or []),
+                        "raw_content": raw,
+                    }
+                    os.makedirs(_RAW["dir"], exist_ok=True)
+                    with open(os.path.join(_RAW["dir"], "raw_llm.jsonl"), "a", encoding="utf-8") as f:
+                        f.write(json.dumps(line, ensure_ascii=False) + "\n")
+            except Exception:
+                pass
+            return response
+
+        client.chat = chat_trace
+        return client
+
+    Qwen3ChatOllama.get_client = logging_get_client
+    _RAW["dir"] = directory
+
+
 def write_json_exclusive(directory, base_name, data):
     os.makedirs(directory, exist_ok=True)
     for attempt in range(16):
@@ -114,6 +155,13 @@ def build_benchmark_record(task, model, harness_record, checks, fcat, run_no, ex
         and fcat in {"interaction_failure", "extraction_failure", "verification_failure", "model_output_failure"}
     )
     model_family = model.split(":")[0] if ":" in model else model
+    pages = checks.get("pages") or {}
+    pa = pages.get("compare_a.html") or {}
+    pb = pages.get("compare_b.html") or {}
+    destination_a_reached = bool(pa.get("reached"))
+    destination_b_reached = bool(pb.get("reached"))
+    data_a_match = pa.get("match")
+    data_b_match = pb.get("match")
 
     return {
         "run_id": f"{model_dirname(model)}_{task.task_id}_{run_no:02d}_{exec_ts.strftime('%Y%m%d_%H%M%S')}",
@@ -133,6 +181,10 @@ def build_benchmark_record(task, model, harness_record, checks, fcat, run_no, ex
         "destination_ok": bool(checks["destination_ok"]),
         "data_ok": data_ok,
         "synthesis_ok": synth_ok,
+        "destination_a_reached": destination_a_reached,
+        "destination_b_reached": destination_b_reached,
+        "data_a_match": data_a_match,
+        "data_b_match": data_b_match,
         "failure_category": fcat,
         "steps": int(harness_record.get("steps", 0)),
         "max_steps": task.max_steps,
@@ -176,6 +228,9 @@ async def run_model(args, model, server, verifier, selected):
     }
     import e2e_runner as harness
 
+    if args.raw_llm_log:
+        install_raw_llm_logger(os.path.join(args.raw_llm_log, model_dirname(model)))
+
     print("=" * 70)
     print(f"  BENCHMARK {BENCHMARK_VERSION}  model={model}")
     print("=" * 70)
@@ -191,6 +246,8 @@ async def run_model(args, model, server, verifier, selected):
         started = time.time()
         for run_no in range(1, args.runs + 1):
             global_seq += 1
+            if _RAW["dir"]:
+                _RAW["label"] = f"{model}|{task.task_id}|run{run_no}"
             try:
                 harness_record = await harness.run_one(global_seq, harness_args)
             except Exception as exc:
@@ -273,6 +330,7 @@ def parse_args(argv=None):
     )
     p.add_argument("--context-trace", action="store_true", help="emitir per-step context JSONL")
     p.add_argument("--experiment-condition", default=None, help="etiqueta de condicion (p.ej. A/B)")
+    p.add_argument("--raw-llm-log", default=None, help="dir para persistir B (respuesta cruda de Ollama) por call (debug)")
     p.add_argument("--verifier-headless", dest="verifier_headless", action="store_true", default=True)
     return p.parse_args(argv)
 
