@@ -4,3 +4,12 @@ __pycache__/
 .env
 *.log
 .vscode/
+
+browser_profile/
+browser_profile_chat/
+
+browser_profile/
+browser_profile_chat/
+*.txt
+*.log
+backups_chat_brain/
