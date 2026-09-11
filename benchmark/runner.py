@@ -67,10 +67,11 @@ def build_harness_args(task, model, base_url, overrides):
     )
 
 
-def build_benchmark_record(task, model, harness_record, checks, fcat):
+def build_benchmark_record(task, model, harness_record, checks, fcat, run_no, exec_ts):
     trace_meta = parse_trace(harness_record.get("trace") or [])
     visited = trace_meta["visited"]
     final_url = harness_record.get("observed_url") or (visited[-1] if visited else None)
+    exec_ts = exec_ts or datetime.now()
 
     errors = [e for e in (harness_record.get("errors") or []) if e]
     errors_low = norm_lower(" ".join(errors))
@@ -91,17 +92,29 @@ def build_benchmark_record(task, model, harness_record, checks, fcat):
     success = fcat == "success"
     data_ok = bool(checks["data_ok"])
     synth_ok = checks["synthesis_ok"]  # True/False, or None when the task has no synthesis
+    verified_all = bool(checks["destination_ok"]) and data_ok and (
+        bool(synth_ok) if synth_ok is not None else True
+    )
+    done_false_positive = (
+        bool(harness_record.get("done"))
+        and not verified_all
+        and fcat in {"interaction_failure", "extraction_failure", "verification_failure", "model_output_failure"}
+    )
+    model_family = model.split(":")[0] if ":" in model else model
 
     return {
+        "run_id": f"{model_dirname(model)}_{task.task_id}_{run_no:02d}_{exec_ts.strftime('%Y%m%d_%H%M%S')}",
         "benchmark_version": BENCHMARK_VERSION,
         "task_id": task.task_id,
         "tier": task.tier,
         "task_name": task.name,
         "model": model,
-        "timestamp": datetime.now().isoformat(timespec="seconds"),
+        "model_family": model_family,
+        "timestamp": exec_ts.isoformat(timespec="seconds"),
         "done": bool(harness_record.get("done")),
         "success": success,
         "verified": data_ok,
+        "verified_all": verified_all,
         "destination_ok": bool(checks["destination_ok"]),
         "data_ok": data_ok,
         "synthesis_ok": synth_ok,
@@ -125,6 +138,7 @@ def build_benchmark_record(task, model, harness_record, checks, fcat):
         "trace_actions": trace_meta["action_counts"],
         "visited_urls": visited,
         "verification_details": checks["groups"],
+        "done_false_positive": done_false_positive,
     }
 
 
@@ -181,10 +195,11 @@ async def run_model(args, model, server, verifier, selected):
             verify_record = _classification_record(harness_record, task)
             checks = await verifier.verify_task(task, verify_record)
             fcat = classify_failure(task, verify_record, checks)
-            bench = build_benchmark_record(task, model, harness_record, checks, fcat)
+            exec_ts = datetime.now()
+            bench = build_benchmark_record(task, model, harness_record, checks, fcat, run_no, exec_ts)
             filename = write_json_exclusive(
                 str(runs_dir),
-                f"run_{datetime.now().strftime('%Y%m%d_%H%M%S')}_{task.task_id}_{run_no:02d}.json",
+                f"run_{exec_ts.strftime('%Y%m%d_%H%M%S')}_{task.task_id}_{run_no:02d}.json",
                 bench,
             )
             task_success += 1 if bench["success"] else 0
