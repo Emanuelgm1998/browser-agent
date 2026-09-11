@@ -34,6 +34,16 @@ def model_dirname(model):
     return model.replace(":", "_")
 
 
+def resolve_include_attributes(value):
+    if value is None or value == "default":
+        return None
+    if value == "default+href":
+        from browser_use.dom.views import DEFAULT_INCLUDE_ATTRIBUTES
+
+        return list(DEFAULT_INCLUDE_ATTRIBUTES) + ["href"]
+    return [v.strip() for v in str(value).split(",") if v.strip()]
+
+
 def write_json_exclusive(directory, base_name, data):
     os.makedirs(directory, exist_ok=True)
     for attempt in range(16):
@@ -64,6 +74,9 @@ def build_harness_args(task, model, base_url, overrides):
         max_history_items=overrides.get("max_history_items", 8),
         extra_prompt=not overrides.get("no_extra_prompt", False),
         headed=overrides.get("headed", False),
+        include_attributes=overrides.get("include_attributes"),
+        context_trace=overrides.get("context_trace", False),
+        experiment_condition=overrides.get("experiment_condition"),
     )
 
 
@@ -110,6 +123,8 @@ def build_benchmark_record(task, model, harness_record, checks, fcat, run_no, ex
         "task_name": task.name,
         "model": model,
         "model_family": model_family,
+        "experiment_condition": harness_record.get("experiment_condition"),
+        "include_attributes": harness_record.get("include_attributes"),
         "timestamp": exec_ts.isoformat(timespec="seconds"),
         "done": bool(harness_record.get("done")),
         "success": success,
@@ -155,6 +170,9 @@ async def run_model(args, model, server, verifier, selected):
         "max_history_items": args.max_history_items,
         "no_extra_prompt": not args.extra_prompt,
         "headed": args.headed,
+        "include_attributes": args.include_attributes,
+        "context_trace": args.context_trace,
+        "experiment_condition": args.experiment_condition,
     }
     import e2e_runner as harness
 
@@ -248,6 +266,13 @@ def parse_args(argv=None):
     p.add_argument("--num-ctx", type=int, default=8192)
     p.add_argument("--num-predict", type=int, default=1024)
     p.add_argument("--max-history-items", type=int, default=8)
+    p.add_argument(
+        "--include-attributes",
+        default=None,
+        help="default | default+href | comma-separated list (experimento A/B href)",
+    )
+    p.add_argument("--context-trace", action="store_true", help="emitir per-step context JSONL")
+    p.add_argument("--experiment-condition", default=None, help="etiqueta de condicion (p.ej. A/B)")
     p.add_argument("--verifier-headless", dest="verifier_headless", action="store_true", default=True)
     return p.parse_args(argv)
 
@@ -299,6 +324,7 @@ def generate_reports(args, ts=None):
 
 def main(argv=None):
     args = parse_args(argv)
+    args.include_attributes = resolve_include_attributes(args.include_attributes)
     if args.report_only:
         generate_reports(args)
         return 0

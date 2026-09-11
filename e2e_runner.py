@@ -112,6 +112,162 @@ class WatchdogSignalHandler(logging.Handler):
             self.done_holder["watchdog_logged"] = True
 
 
+# ---------------------------------------------------------------------------
+# Instrumentación aditiva de contexto por step (experimento A/B href).
+# NO modifica browser_use: monkey-patch de solo lectura en runtime, inactivo
+# salvo que args.context_trace sea True. Si falla, nunca rompe la corrida.
+# ---------------------------------------------------------------------------
+
+_CTX_FLAG = "__browser_agent_ctx_trace__"
+_CTX = {"holder": None, "attempt": None}
+_TOKENIZER = {"tok": None, "err": None}
+
+
+def _ctx_url_has(href, needle):
+    href = (href or "").rsplit("#", 1)[0].rstrip("/")
+    return needle in href
+
+
+def _ctx_message_text(message):
+    content = getattr(message, "content", None)
+    if content is None:
+        return ""
+    if isinstance(content, str):
+        return content
+    parts = []
+    for p in content:
+        if getattr(p, "type", None) == "text":
+            parts.append(getattr(p, "text", "") or "")
+    return "\n".join(parts)
+
+
+def _ctx_token_count(text):
+    try:
+        if _TOKENIZER["tok"] is None and _TOKENIZER["err"] is None:
+            try:
+                from transformers import AutoTokenizer
+
+                _TOKENIZER["tok"] = AutoTokenizer.from_pretrained("Qwen/Qwen3-1.7B")
+            except Exception as exc:
+                _TOKENIZER["err"] = str(exc)
+        if _TOKENIZER["tok"] is not None:
+            return len(_TOKENIZER["tok"].encode(text or "", add_special_tokens=False))
+    except Exception:
+        pass
+    return None
+
+
+def _ctx_collect_hrefs(dom_state):
+    root = getattr(dom_state, "_root", None)
+    hrefs = []
+    interactive = 0
+    if root is None:
+        return hrefs, interactive
+    stack = [root]
+    while stack:
+        node = stack.pop()
+        if node is None:
+            continue
+        if getattr(node, "is_interactive", False):
+            interactive += 1
+        original = getattr(node, "original_node", None)
+        if original is not None:
+            tag = (getattr(original, "tag_name", "") or "").lower()
+            attrs = getattr(original, "attributes", None) or {}
+            if tag == "a":
+                h = attrs.get("href")
+                if h and str(h).strip():
+                    hrefs.append(str(h).strip())
+        for child in getattr(node, "children", None) or []:
+            stack.append(child)
+    return hrefs, interactive
+
+
+def _ctx_error(which, exc):
+    holder = _CTX.get("holder")
+    if holder is not None:
+        holder.setdefault("ctx_errors", []).append(f"{which}: {type(exc).__name__}: {exc}")
+
+
+def ensure_ctx_tracer():
+    from browser_use.agent.message_manager.service import MessageManager
+
+    if getattr(MessageManager, _CTX_FLAG, False):
+        return
+    orig_create = MessageManager.create_state_messages
+    orig_get = MessageManager.get_messages
+
+    def traced_create(self, browser_state_summary=None, *a, **k):
+        result = orig_create(self, browser_state_summary, *a, **k)
+        try:
+            step_info = k.get("step_info")
+            step = getattr(step_info, "step_number", None) if step_info is not None else None
+            record = {
+                "step": step,
+                "url": getattr(browser_state_summary, "url", None),
+                "title": getattr(browser_state_summary, "title", None),
+                "hrefs": [],
+                "href_count": 0,
+                "interactive_elements": 0,
+                "compare_a_present": False,
+                "compare_b_present": False,
+                "state_message": getattr(self, "last_state_message_text", None) or "",
+            }
+            dom = getattr(browser_state_summary, "dom_state", None)
+            hrefs, interactive = _ctx_collect_hrefs(dom)
+            record["hrefs"] = hrefs
+            record["href_count"] = len(hrefs)
+            record["interactive_elements"] = interactive
+            record["compare_a_present"] = any(_ctx_url_has(h, "compare_a.html") for h in hrefs)
+            record["compare_b_present"] = any(_ctx_url_has(h, "compare_b.html") for h in hrefs)
+            holder = _CTX.get("holder")
+            if holder is not None:
+                holder["ctx_last_state"] = record
+        except Exception as exc:
+            _ctx_error("create_state_messages", exc)
+        return result
+
+    def traced_get(self):
+        messages = orig_get(self)
+        try:
+            texts = [_ctx_message_text(m) for m in messages]
+            context_text = "\n\n".join(texts)
+            state = (_CTX.get("holder") or {}).get("ctx_last_state") or {}
+            line = dict(state)
+            line.update(
+                {
+                    "attempt": _CTX.get("attempt"),
+                    "messages_count": len(messages),
+                    "state_chars": len(state.get("state_message") or ""),
+                    "state_tokens": _ctx_token_count(state.get("state_message") or ""),
+                    "context_chars": len(context_text),
+                    "context_tokens": _ctx_token_count(context_text),
+                }
+            )
+            holder = _CTX.get("holder")
+            if holder is not None:
+                holder.setdefault("ctx_steps", []).append(line)
+        except Exception as exc:
+            _ctx_error("get_messages", exc)
+        return messages
+
+    MessageManager.create_state_messages = traced_create
+    MessageManager.get_messages = traced_get
+    setattr(MessageManager, _CTX_FLAG, True)
+
+
+def parse_include_attributes(value):
+    if value is None or value == "default":
+        return None
+    if value == "default+href":
+        from browser_use.dom.views import DEFAULT_INCLUDE_ATTRIBUTES
+
+        return list(DEFAULT_INCLUDE_ATTRIBUTES) + ["href"]
+    if isinstance(value, list):
+        return value
+    return [v.strip() for v in str(value).split(",") if v.strip()]
+
+
 def build_tools():
     tools = Tools()
     registry = tools.registry.registry.actions
@@ -315,6 +471,7 @@ def build_agent(args, done_holder):
         enable_signal_handler=False,
         extend_system_message=EXTRA_PROMPT if args.extra_prompt else None,
         register_done_callback=done_callback,
+        include_attributes=getattr(args, "include_attributes", None),
     )
     done_holder["agent"] = agent
     return agent
@@ -409,6 +566,10 @@ async def run_one(index, args):
     while True:
         attempt_no += 1
         done_holder = {}
+        if getattr(args, "context_trace", False):
+            ensure_ctx_tracer()
+        _CTX["holder"] = done_holder
+        _CTX["attempt"] = attempt_no
         res = await _run_single(args, done_holder)
         res["attempt"] = attempt_no
 
@@ -445,6 +606,9 @@ async def run_one(index, args):
         )
         await asyncio.sleep(wait_s)
 
+    _CTX["holder"] = None
+    _CTX["attempt"] = None
+
     elapsed_total = round(sum(a["elapsed_s"] for a in attempts), 2)
 
     observed_title = done_holder.get("title")
@@ -479,6 +643,9 @@ async def run_one(index, args):
         "model": args.model,
         "task": args.task,
         "expected": args.expected,
+        "experiment_condition": getattr(args, "experiment_condition", None),
+        "include_attributes": getattr(args, "include_attributes", None),
+        "context_trace": bool(getattr(args, "context_trace", False)),
         "settings": {
             "max_steps": args.max_steps,
             "max_failures": args.max_failures,
@@ -519,6 +686,22 @@ async def run_one(index, args):
     )
     run_file = write_json_exclusive(model_dir, base_name, record)
 
+    ctx_steps = done_holder.get("ctx_steps") or []
+    if getattr(args, "context_trace", False) and ctx_steps:
+        ctx_path = run_file[:-5] + ".ctx.jsonl"
+        with open(ctx_path, "w", encoding="utf-8") as f:
+            for _line in ctx_steps:
+                _line = dict(_line)
+                _line.update(
+                    {
+                        "run_index": index,
+                        "condition": getattr(args, "experiment_condition", None),
+                        "model": args.model,
+                        "record_file": os.path.basename(run_file),
+                    }
+                )
+                f.write(json.dumps(_line, ensure_ascii=False) + "\n")
+
     print()
     print(f"--- Corrida {index} ---")
     print(f"  done={res['done']} successful={res['successful']} verified={verified} passed={passed}")
@@ -549,6 +732,21 @@ async def main():
     parser.add_argument("--num-predict", type=int, default=1024)
     parser.add_argument("--max-history-items", type=int, default=6)
     parser.add_argument(
+        "--include-attributes",
+        default=None,
+        help="default | default+href | comma-separated list (experimento A/B href)",
+    )
+    parser.add_argument(
+        "--context-trace",
+        action="store_true",
+        help="emitir per-step context JSONL junto a cada corrida run_*.ctx.jsonl",
+    )
+    parser.add_argument(
+        "--experiment-condition",
+        default=None,
+        help="etiqueta de condicion (p.ej. A/B) para el experimento",
+    )
+    parser.add_argument(
         "--no-extra-prompt",
         dest="extra_prompt",
         action="store_false",
@@ -560,6 +758,7 @@ async def main():
         help="Mostrar Chromium (por defecto headless)",
     )
     args = parser.parse_args()
+    args.include_attributes = parse_include_attributes(args.include_attributes)
 
     print("=" * 70)
     print("        E2E RUNNER  Qwen3 -> browser-use -> Chromium")
