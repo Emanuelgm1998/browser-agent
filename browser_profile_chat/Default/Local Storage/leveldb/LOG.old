@@ -1,6 +1,0 @@
-2026/09/11-19:07:29.061 288c Reusing MANIFEST C:\Users\Cloud\browser-agent\browser_profile_chat\Default\Local Storage\leveldb/MANIFEST-000001
-2026/09/11-19:07:29.091 288c Recovering log #17
-2026/09/11-19:07:29.106 288c Reusing old log C:\Users\Cloud\browser-agent\browser_profile_chat\Default\Local Storage\leveldb/000017.log 
-2026/09/11-19:07:37.745 2c18 Level-0 table #21: started
-2026/09/11-19:07:37.750 2c18 Level-0 table #21: 12496 bytes OK
-2026/09/11-19:07:37.753 2c18 Delete type=0 #17
