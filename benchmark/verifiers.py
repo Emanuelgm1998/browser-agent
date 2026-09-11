@@ -32,7 +32,9 @@ def path_of(url):
     if not url:
         return None
     p = urlparse(url).path or "/"
-    return p.rstrip("/")
+    if p == "/":
+        return "/"
+    return p.rstrip("/") or "/"
 
 
 def _norm_url(url):
@@ -184,7 +186,7 @@ class Verifier:
                 pass
 
     def _record_url(self, record):
-        url = record.get("final_url")
+        url = record.get("final_url") or record.get("observed_url")
         if not url:
             visited = (record.get("visited_urls") or [])
             url = visited[-1] if visited else None
@@ -205,14 +207,16 @@ class Verifier:
             expected = check["expected"]
             mode = check.get("mode", "exact")
             actual_url = target
+            if not actual_url:
+                return {"ok": False, "expected": expected, "actual": None, "note": "no target url (agent no llego a ninguna URL)"}
             local = norm_lower(_norm_url(expected)) if expected else None
             actual = norm_lower(_norm_url(actual_url)) if actual_url else None
             if mode == "suffix":
-                exp_path = path_of(expected) or "/"
+                exp_path = path_of(expected)
                 act_path = path_of(actual_url) or "/"
-                ok = act_path.endswith(exp_path) and exp_path in act_path
+                ok = bool(exp_path) and act_path.endswith(exp_path) and exp_path in act_path
             else:
-                ok = target and actual == local
+                ok = actual is not None and actual == local
             return {"ok": ok, "expected": expected, "actual": actual_url}
         if ctype == "final_url_in":
             allowed = check["allowed"]

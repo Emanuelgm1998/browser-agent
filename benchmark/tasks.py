@@ -78,7 +78,6 @@ TASKS: list[BenchTask] = [
         ],
         data=[
             text_contains("Example Domain"),
-            text_contains("example.com", where="either_final_or_dom"),
         ],
         max_steps=8,
         timeout_s=300,

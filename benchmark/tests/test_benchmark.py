@@ -24,6 +24,7 @@ from benchmark.verifiers import (
     path_of,
 )
 from benchmark.report import build_report_data, format_report, format_comparison
+from benchmark.runner import _classification_record
 
 _PASS = []
 _FAIL = []
@@ -258,6 +259,51 @@ async def test_verifier_checks():
             full = await v.verify_task(t4, rec4)
             check("verify_task no-synthesis is None", full["synthesis_ok"] is None)
             check("verify_task T4 passes", full["destination_ok"] and full["data_ok"])
+
+            # regression: runner path passes a harness-shaped record; verify_task
+            # must use _classification_record (final_url/visited_urls derived)
+            t2 = TASKS_BY_ID["T2"]
+            harness_like = {
+                "done": True,
+                "observed_title": "Anchor Page",
+                "observed_url": srv.url("anchor.html"),
+                "final_result": "The sentence is: The sky above the phoenix was turquoise, painted in code #K7QZ4.",
+                "trace": [
+                    {"url": srv.url("anchor.html"), "actions": [{"navigate": {"url": srv.url("anchor.html")}}], "result": []},
+                ],
+            }
+            vr = _classification_record(harness_like, t2)
+            vfull = await v.verify_task(t2, vr)
+            check("runner-path T2 dest ok", vfull["destination_ok"] is True)
+            check("runner-path T2 data ok", vfull["data_ok"] is True)
+            check("runner-path T2 classify success", classify_failure(t2, vr, vfull) == "success")
+
+            # url check without any reached URL must NOT pass vacuously
+            r = await v._check(
+                {"type": "final_url_equals", "expected": "https://example.com/", "mode": "suffix"},
+                {"done": True, "final_url": None, "observed_url": None},
+            )
+            check("url check fails without target", r["ok"] is False)
+            # root path suffix (T1) must pass for https://example.com/
+            r = await v._check(
+                {"type": "final_url_equals", "expected": "https://example.com/", "mode": "suffix"},
+                {"done": True, "final_url": "https://example.com/", "observed_title": "Example Domain",
+                 "observed_url": "https://example.com/"},
+            )
+            check("root path suffix passes", r["ok"] is True)
+            # full T1 path through the runner
+            t1 = TASKS_BY_ID["T1"]
+            harness_t1 = {
+                "done": True,
+                "observed_title": "Example Domain",
+                "observed_url": "https://example.com/",
+                "final_result": "Example Domain",
+                "trace": [{"url": "https://example.com/", "actions": [{"navigate": {"url": "https://example.com"}}], "result": []}],
+            }
+            t1_full = await v.verify_task(t1, _classification_record(harness_t1, t1))
+            check("T1 runner-path dest ok", t1_full["destination_ok"] is True)
+            check("T1 runner-path data ok", t1_full["data_ok"] is True)
+            check("T1 runner-path success", classify_failure(t1, _classification_record(harness_t1, t1), t1_full) == "success")
         finally:
             await v.close()
 

@@ -178,12 +178,9 @@ async def run_model(args, model, server, verifier, selected):
                     "observed_url": None,
                 }
                 print(f"  [{task.task_id} run {run_no}/{args.runs}] HARNESS EXCEPTION: {type(exc).__name__}: {exc}")
-            checks = await verifier.verify_task(task, harness_record)
-            fcat = classify_failure(
-                task,
-                {**_classification_record(harness_record, task), "trace": harness_record.get("trace") or []},
-                checks,
-            )
+            verify_record = _classification_record(harness_record, task)
+            checks = await verifier.verify_task(task, verify_record)
+            fcat = classify_failure(task, verify_record, checks)
             bench = build_benchmark_record(task, model, harness_record, checks, fcat)
             filename = write_json_exclusive(
                 str(runs_dir),
@@ -210,7 +207,9 @@ async def run_model(args, model, server, verifier, selected):
 def _classification_record(harness_record, task):
     rec = dict(harness_record)
     rec["max_steps"] = task.max_steps
-    rec["visited_urls"] = parse_trace(harness_record.get("trace") or [])["visited"]
+    visited = parse_trace(harness_record.get("trace") or [])["visited"]
+    rec["visited_urls"] = visited
+    rec["final_url"] = harness_record.get("observed_url") or (visited[-1] if visited else None)
     return rec
 
 
